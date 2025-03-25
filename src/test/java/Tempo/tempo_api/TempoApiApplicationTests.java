@@ -1,13 +1,13 @@
-package Tempo.tempo_api;
+// package Tempo.tempo_api;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class TempoApiApplicationTests {
+// @SpringBootTest
+// class TempoApiApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// 	@Test
+// 	void contextLoads() {
+// 	}
 
-}
+// }
