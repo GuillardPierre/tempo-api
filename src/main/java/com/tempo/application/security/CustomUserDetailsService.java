@@ -1,10 +1,14 @@
-package com.tempo.application.User;
+package com.tempo.application.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.tempo.application.model.user.User;
+import com.tempo.application.repository.UserRepository;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collections;
 

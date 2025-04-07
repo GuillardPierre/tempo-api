@@ -1,7 +1,7 @@
 package com.tempo.application.config;
 
-import com.tempo.application.User.CustomUserDetailsService;
-import com.tempo.application.filter.JwtFilter;
+import com.tempo.application.security.CustomUserDetailsService;
+import com.tempo.application.security.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
 

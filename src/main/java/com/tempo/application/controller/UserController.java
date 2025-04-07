@@ -1,4 +1,4 @@
-package com.tempo.application.User;
+package com.tempo.application.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +9,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tempo.application.config.JwtUtils;
+import com.tempo.application.model.user.User;
+import com.tempo.application.model.user.UserCreateDto;
+import com.tempo.application.model.user.UserDto;
+import com.tempo.application.repository.UserRepository;
+import com.tempo.application.service.UserService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,9 +33,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    
-    @Autowired
-    private BCryptPasswordEncoder encoder;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -39,21 +41,20 @@ public class UserController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/signup")
-    public @ResponseBody String signupUser(@RequestBody User request) { 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return "Email déjà utilisé.";
+    public ResponseEntity<?> signupUser(@Valid @RequestBody UserCreateDto request) { 
+        try {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                return ResponseEntity.badRequest().body("Email déjà utilisé.");
+            }
+            UserDto createdUser = userService.register(request);
+            return ResponseEntity.ok(createdUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return userService.register(request).toString();
     }
     
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User request) {
-        // User user = userRepository.findByEmail(request.getEmail());        
-        // if (user != null && encoder.matches(request.getPassword(), user.getPassword())) {
-        //     return "Login successful! Welcome, " + user.getFullName() + "!";
-        // } else {
-        //     return "Invalid email or password.";
-        // }
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             if (authentication.isAuthenticated()) {

@@ -1,4 +1,4 @@
-package com.tempo.application.filter;
+package com.tempo.application.security;
 
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,7 +8,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.tempo.application.User.CustomUserDetailsService;
 import com.tempo.application.config.JwtUtils;
 
 import jakarta.servlet.FilterChain;
