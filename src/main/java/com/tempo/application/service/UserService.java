@@ -27,14 +27,14 @@ public class UserService {
     private UserDto toDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
-        userDto.setName(user.getName());
+        userDto.setUsername(user.getName());
         userDto.setEmail(user.getEmail());
         return userDto;
     }
 
     private User toEntity(UserCreateDto userCreateDto){
         User user = new User();
-        user.setName(userCreateDto.getName());
+        user.setName(userCreateDto.getUsername());
         user.setEmail(userCreateDto.getEmail());
         user.setPassword(userCreateDto.getPassword());
         return user;

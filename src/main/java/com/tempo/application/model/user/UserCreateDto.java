@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCreateDto {
-    @NotBlank(message = "Name is mandatory")
-    private  String name;
+    @NotBlank(message = "username is mandatory")
+    private  String username;
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email format is invalid")
     private String email;
