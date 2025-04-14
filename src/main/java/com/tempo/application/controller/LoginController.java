@@ -9,12 +9,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.tempo.application.config.JwtUtils;
 import com.tempo.application.model.refreshToken.RefreshToken;
-import com.tempo.application.model.refreshToken.DTO.JwtResponseDTO;
 import com.tempo.application.model.refreshToken.DTO.RefreshTokenDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.model.user.UserCreateDto;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-@Controller
+@RestController
 @RequestMapping(path="/user")
 public class LoginController {
     @Autowired
@@ -62,9 +61,10 @@ public class LoginController {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             if (authentication.isAuthenticated()) {
+                System.out.println("COUCOU");
                  Map<String, Object> authData = new HashMap<>();
-                authData.put("refreshToken", refreshTokenService.createRefreshToken(request.getEmail()).getToken());
                 authData.put("token", jwtUtils.generateToken(request.getEmail()));
+                authData.put("refreshToken", refreshTokenService.createRefreshToken(request.getEmail()).getToken());
                 authData.put("type", "Bearer");
                 return ResponseEntity.ok(authData);
             }

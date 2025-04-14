@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tempo.application.model.refreshToken.RefreshToken;
+import com.tempo.application.model.user.User;
 import com.tempo.application.repository.ResfreshTokenRepository;
 import com.tempo.application.repository.UserRepository;
 
@@ -21,8 +22,11 @@ public class RefreshTokenService {
     UserRepository userRepository;
 
     public RefreshToken createRefreshToken(String email) {
+        User user = userRepository.findByEmail(email);   
+        resfreshTokenRepository.findByUser(user)
+            .ifPresent(token -> resfreshTokenRepository.delete(token));
         RefreshToken refreshToken = RefreshToken.builder()
-                .user(userRepository.findByEmail(email))
+                .user(user)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(1000 * 60 * 60 * 24 * 7)) // 7 days
                 .build();

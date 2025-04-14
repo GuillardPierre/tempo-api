@@ -1,11 +1,24 @@
 package com.tempo.application.model.user;
 
+import java.util.List;
+
+import com.tempo.application.model.category.Category;
+import com.tempo.application.model.worktime.Worktime;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,29 +30,9 @@ public class User {
 
     private String password;
 
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setName(String username) {
-        this.username = username;
-    }
-    public String getName() {
-        return username;
-    }
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Category> categories;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Worktime> worktimes;
 }
