@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Configuration des appenders -->
+    <property name="LOGS" value="./logs" />
+
+    <!-- Console appender pour les logs de niveau INFO et au-dessus -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{ISO8601} %highlight(%-5level) [%blue(%t)] %yellow(%C{1}): %msg%n%throwable</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File appender pour tous les logs -->
+    <appender name="AllLogs" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/tempo-api.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{ISO8601} %-5level [%t] %C{1}: %msg%n%throwable</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/tempo-api-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- File appender pour les logs d'erreurs uniquement -->
+    <appender name="ErrorLogs" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/tempo-api-errors.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{ISO8601} %-5level [%t] %C{1}: %msg%n%throwable</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/tempo-api-errors-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Logger spécifique pour notre application -->
+    <logger name="com.tempo.application" level="info" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AllLogs" />
+        <appender-ref ref="ErrorLogs" />
+    </logger>
+
+    <!-- Logger ROOT pour les autres packages -->
+    <root level="info">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AllLogs" />
+        <appender-ref ref="ErrorLogs" />
+    </root>
+</configuration>

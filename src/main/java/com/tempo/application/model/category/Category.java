@@ -1,5 +1,6 @@
 package com.tempo.application.model.category;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.tempo.application.model.user.User;
 
 import jakarta.persistence.Entity;
@@ -7,14 +8,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Category {
     @Id
@@ -23,7 +26,8 @@ public class Category {
 
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "worktime_id", referencedColumnName = "id")
-    private User userId;
+    @JsonBackReference(value = "user-category")
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

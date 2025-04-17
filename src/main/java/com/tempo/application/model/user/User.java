@@ -2,11 +2,13 @@ package com.tempo.application.model.user;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.worktime.Worktime;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,9 +32,11 @@ public class User {
 
     private String password;
 
-        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Category> categories;
+    // @JsonManagedReference(value = "user-category")
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<Category> categories;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Worktime> worktimes;
+    // @JsonManagedReference(value = "user-worktime")
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<Worktime> worktimes;
 }

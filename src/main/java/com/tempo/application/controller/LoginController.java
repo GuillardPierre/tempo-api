@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping(path="/user")
 public class LoginController {
-    @Autowired
-    private UserRepository userRepository;
-
+    
     @Autowired
     private UserService userService;
 
