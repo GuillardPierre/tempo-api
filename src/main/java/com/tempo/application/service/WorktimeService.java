@@ -1,5 +1,8 @@
 package com.tempo.application.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,12 +12,11 @@ import org.springframework.stereotype.Service;
 
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
-
 import com.tempo.application.model.worktime.Worktime;
 import com.tempo.application.model.worktime.DTO.WorktimeRequestDTO;
-import com.tempo.application.repository.WorktimeRepository;
 import com.tempo.application.repository.CategoryRepository;
 import com.tempo.application.repository.UserRepository;
+import com.tempo.application.repository.WorktimeRepository;
 import com.tempo.application.utils.LoggerUtils;
 
 
@@ -119,5 +121,11 @@ public class WorktimeService {
         } else {
             throw new RuntimeException("Worktime with id " + id + " does not exist.");
         }
+    }
+
+    public List<Worktime> getAllUserWorktimesByDate(LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+        return worktimeRepository.findByStartTimeBetween(startOfDay, endOfDay);
     }
 }

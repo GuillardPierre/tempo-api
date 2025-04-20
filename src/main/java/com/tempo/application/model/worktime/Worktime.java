@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
 
@@ -20,10 +21,14 @@ import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -32,8 +37,11 @@ public class Worktime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String startTime;
-    private String endTime;
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime startTime;
+
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime endTime;
     
     @Enumerated(EnumType.STRING)
     private WorktimeType type;
@@ -59,10 +67,7 @@ public class Worktime {
         
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            LocalDateTime start = LocalDateTime.parse(startTime, formatter);
-            LocalDateTime end = LocalDateTime.parse(endTime, formatter);
-            
-            Duration duration = Duration.between(start, end);
+            Duration duration = Duration.between(startTime, endTime);
             return duration.toMinutes();
         } catch (Exception e) {
             return 0L;

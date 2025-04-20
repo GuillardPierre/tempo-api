@@ -1,5 +1,7 @@
 package com.tempo.application.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -76,6 +78,26 @@ public class WorktimeController {
             return ResponseEntity.badRequest().body("Error retrieving worktimes: " + e.getMessage());
         }
     }
+
+    @GetMapping("/user/{date}")
+    public ResponseEntity<?> getUserWorktimesDate(@PathVariable String date) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("User not found");
+            }
+
+            LocalDate localDate = LocalDate.parse(date);
+            List<Worktime> worktimes = worktimeService.getAllUserWorktimesByDate(localDate);
+            return ResponseEntity.ok(worktimes);
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error retrieving user worktimes: " + e.getMessage(), e);
+            return ResponseEntity.badRequest().body("Error retrieving worktimes: " + e.getMessage());
+        }
+    }
+
     
     @GetMapping("/{id}")
     public ResponseEntity<?> getWorktime(@PathVariable int id) {

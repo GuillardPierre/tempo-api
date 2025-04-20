@@ -3,6 +3,9 @@ package com.tempo.application.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tempo.application.model.worktime.Worktime;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,5 +14,7 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
 
     // Retourne tous les worktimes liés à un id utilisateur
     List<Worktime> findByUserId(Integer userId);
-    
+
+    List<Worktime> findByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+
 }

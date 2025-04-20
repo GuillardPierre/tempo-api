@@ -3,11 +3,14 @@ package com.tempo.application.model.worktime.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Data
 public class WorktimeRequestDTO {
     private Integer id;
-    private String startTime;
-    private String endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private Category category;
 
     @Data
