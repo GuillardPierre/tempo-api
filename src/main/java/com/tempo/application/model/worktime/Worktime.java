@@ -2,7 +2,6 @@ package com.tempo.application.model.worktime;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -66,7 +65,6 @@ public class Worktime {
         }
         
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             Duration duration = Duration.between(startTime, endTime);
             return duration.toMinutes();
         } catch (Exception e) {

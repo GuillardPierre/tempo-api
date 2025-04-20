@@ -2,7 +2,6 @@ package com.tempo.application.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +85,7 @@ public class WorktimeService {
             // Vérifier si on doit utiliser une catégorie existante ou en créer une nouvelle
             if (worktimeUpdateRequest.getCategory().getId() == null) {
                 category = categoryRepository.findByNameAndUser(worktimeUpdateRequest.getCategory().getName(), user);
-                System.out.println("category:" + category);;
+                System.out.println("category:" + category);
                 if (category == null) {
                     LoggerUtils.info(logger, "Creating new category during worktime update: " + worktimeUpdateRequest.getCategory().getName());
                     category = Category.builder()
