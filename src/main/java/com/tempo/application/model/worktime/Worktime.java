@@ -3,18 +3,15 @@ package com.tempo.application.model.worktime;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
 
+import com.tempo.application.model.worktimeSeries.WorktimeSeries;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -36,34 +33,34 @@ public class Worktime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
+    @ManyToOne
+    private WorktimeSeries series;   // null si créneau unique
+
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime startTime;
 
-    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime endTime;
-    
-    @Enumerated(EnumType.STRING)
-    private WorktimeType type;
 
     private boolean isActive;
 
     private String recurrencePattern;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-    
-    @JsonBackReference(value = "user-worktime")
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false)
     private User user;
-    
+
+    @ManyToOne(optional = false)
+    private Category category;
+
+    @Builder.Default
+    private boolean active = true;
+
     @Transient
     public Long getDuration() {
         if (startTime == null || endTime == null) {
             return 0L;
         }
-        
+
         try {
             Duration duration = Duration.between(startTime, endTime);
             return duration.toMinutes();
@@ -72,10 +69,4 @@ public class Worktime {
         }
     }
 
-
-    public enum WorktimeType {
-        PLANNED,    // Temps planifié
-        TRACKED,    // Temps chronométré
-        RECURRENT   // Temps récurrent
-    }
 }

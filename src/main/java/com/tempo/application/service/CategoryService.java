@@ -4,12 +4,13 @@ import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.CategoryRepository;
 import com.tempo.application.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @Service
 public class CategoryService {
     @Autowired
@@ -18,11 +19,11 @@ public class CategoryService {
     @Autowired
     UserRepository userRepository;
 
-    public Optional<List<Category>> findAllByUserId(Integer userId) {
+    public List<Category> findAllByUserId(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return categoryRepository.findCategoriesByUser(user);
+        System.out.println("USER" + user );
+        return categoryRepository.findAllByUserOrderByNameAsc(user);
     }
 
     public Category save(Category category) {

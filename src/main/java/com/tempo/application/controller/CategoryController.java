@@ -11,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/category")
@@ -29,7 +28,7 @@ public class CategoryController {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email);
 
-        Optional<List<Category>> categories = categoryService.findAllByUserId(user.getId());
+        List<Category> categories = categoryService.findAllByUserId(user.getId());
         return ResponseEntity.ok(categories);
     }
 
