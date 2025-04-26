@@ -2,6 +2,7 @@ package com.tempo.application.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.tempo.application.model.user.User;
 import com.tempo.application.model.worktime.Worktime;
 
 import java.time.LocalDateTime;
@@ -15,5 +16,7 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     List<Worktime> findByUserId(Integer userId);
 
     List<Worktime> findByStartTimeBetween(LocalDateTime start, LocalDateTime end);
-
+    
+    // Retourne tous les worktimes pour une plage de dates et un utilisateur spécifique
+    List<Worktime> findByStartTimeBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
 }

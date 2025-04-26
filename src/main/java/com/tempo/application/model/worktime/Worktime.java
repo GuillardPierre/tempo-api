@@ -36,10 +36,10 @@ public class Worktime {
     @ManyToOne
     private WorktimeSeries series;   // null si créneau unique
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    // Format ISO-8601 (2025-04-26T13:30)
     private LocalDateTime startTime;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    // Format ISO-8601 (2025-04-26T13:30)
     private LocalDateTime endTime;
 
     private boolean isActive;

@@ -127,4 +127,23 @@ public class WorktimeService {
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
         return worktimeRepository.findByStartTimeBetween(startOfDay, endOfDay);
     }
+    
+    /**
+     * Récupère tous les créneaux horaires d'un utilisateur pour une date spécifique
+     * 
+     * @param date La date pour laquelle récupérer les créneaux
+     * @param userId L'ID de l'utilisateur
+     * @return Une liste des créneaux horaires pour cette date et cet utilisateur
+     */
+    public List<Worktime> getAllUserWorktimesByDateAndUserId(LocalDate date, Long userId) {
+        LoggerUtils.info(logger, "Fetching worktimes for date: " + date + " and user id: " + userId);
+        
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+        
+        User user = userRepository.findById(Integer.valueOf(userId.intValue()))
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            
+        return worktimeRepository.findByStartTimeBetweenAndUser(startOfDay, endOfDay, user);
+    }
 }
