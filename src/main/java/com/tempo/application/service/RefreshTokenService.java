@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tempo.application.exceptions.TokenRefreshException;
 import com.tempo.application.model.refreshToken.RefreshToken;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.ResfreshTokenRepository;
@@ -40,7 +41,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if(token.getExpiryDate().compareTo(Instant.now()) < 0) {
             resfreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token was expired. Please make a new sign in request");
+            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new sign in request");
         }
         return token;
     }

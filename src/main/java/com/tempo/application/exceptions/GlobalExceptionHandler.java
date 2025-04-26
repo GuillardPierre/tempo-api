@@ -82,6 +82,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
     
+    @ExceptionHandler(TokenRefreshException.class)
+    public ResponseEntity<Map<String, String>> handleTokenRefreshException(TokenRefreshException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Refresh token expired");
+        errorResponse.put("message", ex.getMessage());
+        
+        LoggerUtils.error(logger, "Refresh token error: " + ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+    
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
         Map<String, String> errorResponse = new HashMap<>();

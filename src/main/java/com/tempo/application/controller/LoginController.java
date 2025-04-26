@@ -3,7 +3,9 @@ package com.tempo.application.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tempo.application.config.JwtUtils;
+import com.tempo.application.exceptions.TokenRefreshException;
 import com.tempo.application.model.refreshToken.RefreshToken;
 import com.tempo.application.model.refreshToken.DTO.RefreshTokenDTO;
 import com.tempo.application.model.user.User;
@@ -21,6 +24,7 @@ import com.tempo.application.model.user.UserDto;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.RefreshTokenService;
 import com.tempo.application.service.UserService;
+import com.tempo.application.utils.LoggerUtils;
 
 import jakarta.validation.Valid;
 
@@ -31,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping(path="/user")
 public class LoginController {
+    
+    private static final Logger logger = LoggerUtils.getLogger(LoginController.class);
     
     @Autowired
     private UserService userService;
@@ -59,8 +65,7 @@ public class LoginController {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             if (authentication.isAuthenticated()) {
-                System.out.println("COUCOU");
-                 Map<String, Object> authData = new HashMap<>();
+                Map<String, Object> authData = new HashMap<>();
                 authData.put("token", jwtUtils.generateToken(request.getEmail()));
                 authData.put("refreshToken", refreshTokenService.createRefreshToken(request.getEmail()).getToken());
                 authData.put("type", "Bearer");
@@ -68,35 +73,34 @@ public class LoginController {
             }
             return ResponseEntity.status(401).body("Invalid email or password.");
         } catch (AuthenticationException e) {
-            System.out.println("Authentication failed: " + e.getMessage());
+            LoggerUtils.error(logger, "Authentication failed: " + e.getMessage(), e);
             return ResponseEntity.status(401).body("Invalid email or password.");
         }
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+        String requestRefreshToken = refreshTokenDTO.getToken();
+
         try {
-            return refreshTokenService.findByToken(refreshTokenDTO.getToken())
+            return refreshTokenService.findByToken(requestRefreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String token = jwtUtils.generateToken(user.getEmail());
                     Map<String, Object> authData = new HashMap<>();
-                    authData.put("refreshToken", refreshTokenDTO.getToken());
+                    authData.put("refreshToken", requestRefreshToken);
                     authData.put("token", token);
                     authData.put("type", "Bearer");
                     return ResponseEntity.ok(authData);
                 })
-                .orElseGet(() -> {
-                    Map<String, Object> errorData = new HashMap<>();
-                    errorData.put("error", "Refresh token not found");
-                    return ResponseEntity.status(403).body(errorData);
-                });
-        } catch (AuthenticationException e) {
-            System.out.println("Authentication failed: " + e.getMessage());
-            Map<String, Object> errorData = new HashMap<>();
-            errorData.put("error", "Refresh token is invalid");
-            return ResponseEntity.status(403).body(errorData);
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token not found in database"));
+        } catch (TokenRefreshException e) {
+            LoggerUtils.error(logger, "Token refresh failed: " + e.getMessage(), e);
+            Map<String, String> errorData = new HashMap<>();
+            errorData.put("error", "Refresh token expired");
+            errorData.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
         }
     }
 }
