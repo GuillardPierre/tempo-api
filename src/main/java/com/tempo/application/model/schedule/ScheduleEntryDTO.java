@@ -19,8 +19,9 @@ public class ScheduleEntryDTO {
     private Long seriesId; // uniquement pour les entrées récurrentes
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    
     private Long duration; // en minutes
-    private String recurrencePattern;
+    private String recurrence;
     private boolean isActive;
     private Long categoryId;
     private String categoryName;
@@ -35,7 +36,7 @@ public class ScheduleEntryDTO {
                 .startTime(worktime.getStartTime())
                 .endTime(worktime.getEndTime())
                 .duration(worktime.getDuration())
-                .recurrencePattern(worktime.getRecurrencePattern())
+                .recurrence(worktime.getRecurrencePattern())
                 .isActive(worktime.isActive())
                 .categoryId((long) worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
@@ -47,9 +48,9 @@ public class ScheduleEntryDTO {
         return ScheduleEntryDTO.builder()
                 .id(workTimeSeries.getId())
                 .type("RECURRING")
-                .startTime(workTimeSeries.getStartTime())    // Utilisation de startTime au lieu de startDate
-                .endTime(workTimeSeries.getEndTime())        // Utilisation de endTime au lieu de endDate
-                .recurrencePattern(workTimeSeries.getRecurrence())
+                .startTime(workTimeSeries.getStartTime())  
+                .endTime(workTimeSeries.getEndTime())        
+                .recurrence(workTimeSeries.getRecurrence())
                 .duration(workTimeSeries.getDuration())
                 .isActive(workTimeSeries.isActive())
                 .categoryId((long) workTimeSeries.getCategory().getId())
