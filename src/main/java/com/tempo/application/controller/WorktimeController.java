@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tempo.application.model.user.User;
 import com.tempo.application.model.worktime.Worktime;
 import com.tempo.application.model.worktime.DTO.WorktimeRequestDTO;
+import com.tempo.application.model.worktime.DTO.WorktimeResponseDTO;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.WorktimeService;
 import com.tempo.application.utils.LoggerUtils;
@@ -114,8 +115,9 @@ public class WorktimeController {
                 return ResponseEntity.status(403).body("Access denied");
             }
             
-            worktimeService.updateWorktime(worktimeRequest, id);
-            return ResponseEntity.ok().build();
+            Worktime updatedWorktime = worktimeService.updateWorktime(worktimeRequest, id);
+            WorktimeResponseDTO responseDTO = WorktimeResponseDTO.fromEntity(updatedWorktime);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error updating worktime: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error updating worktime: " + e.getMessage());

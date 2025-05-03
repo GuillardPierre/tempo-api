@@ -74,7 +74,7 @@ public class WorktimeService {
         }
     }
 
-    public void updateWorktime(WorktimeRequestDTO worktimeUpdateRequest, Integer id) {
+    public Worktime updateWorktime(WorktimeRequestDTO worktimeUpdateRequest, Integer id) {
         if (worktimeRepository.existsById(id)) {
             
             Worktime worktime = worktimeRepository.findById(id)
@@ -103,7 +103,7 @@ public class WorktimeService {
             worktime.setStartTime(worktimeUpdateRequest.getStartTime());
             worktime.setEndTime(worktimeUpdateRequest.getEndTime());
             worktime.setCategory(category);
-            worktimeRepository.save(worktime);
+            return worktimeRepository.save(worktime);
         } else {
             throw new RuntimeException("Worktime with id " + id + " does not exist.");
         }
@@ -145,5 +145,17 @@ public class WorktimeService {
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
             
         return worktimeRepository.findByStartTimeBetweenAndUser(startOfDay, endOfDay, user);
+    }
+
+    public List<Worktime> getAllUserWorktimesByMonthAndUserId(LocalDate date, Long userId) {
+        LoggerUtils.info(logger, "Fetching worktimes for month: " + date.getMonth() + " and user id: " + userId);
+        
+        LocalDateTime startOfMonth = date.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endOfMonth = date.plusMonths(1).withDayOfMonth(1).atStartOfDay();
+        
+        User user = userRepository.findById(Integer.valueOf(userId.intValue()))
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            
+        return worktimeRepository.findByStartTimeBetweenAndUser(startOfMonth, endOfMonth, user);
     }
 }

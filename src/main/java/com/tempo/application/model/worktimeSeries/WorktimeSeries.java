@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.model.user.User;
@@ -36,10 +35,10 @@ public class WorktimeSeries {
     private LocalDateTime endDate;    // nullable = récursif jusqu'à annulation
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime startTime;  // Heure de début de chaque occurrence
+    private LocalDateTime startTime;  
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime endTime;    // Heure de fin de chaque occurrence
+    private LocalDateTime endTime;  
 
     private String recurrence;       // RFC5545, ex. "FREQ=WEEKLY;BYDAY=MO,WE,FR"
 

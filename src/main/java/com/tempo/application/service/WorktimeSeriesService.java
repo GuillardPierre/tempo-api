@@ -231,4 +231,48 @@ public class WorktimeSeriesService {
             })
             .collect(Collectors.toList());
     }
+
+    /**
+     * Récupère toutes les séries de créneaux horaires actives pour un mois spécifique et un utilisateur
+     * 
+     * @param date Une date dans le mois pour lequel vérifier l'activité des séries
+     * @param userId L'identifiant de l'utilisateur
+     * @return La liste des séries actives pour ce mois et cet utilisateur
+     */
+    public List<WorktimeSeries> getActiveWorkTimeSeriesForMonthAndUser(LocalDate date, Long userId) {
+        LoggerUtils.info(logger, "Fetching active worktime series for month: " + date.getMonth() + " and user id: " + userId);
+        
+        User user = userRepository.findById(userId.intValue());
+        if (user == null) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        
+        // Obtenir le premier jour du mois
+        LocalDateTime startOfMonth = date.withDayOfMonth(1).atStartOfDay();
+        
+        // Obtenir le premier jour du mois suivant
+        LocalDateTime startOfNextMonth = date.plusMonths(1).withDayOfMonth(1).atStartOfDay();
+        
+        // Récupérer toutes les séries actives de cet utilisateur
+        List<WorktimeSeries> allActiveSeries = repository.findByUserAndActiveTrue(user);
+        
+        // Filtrer pour ne garder que les séries qui sont actives pendant le mois
+        return allActiveSeries.stream()
+            .filter(series -> {
+                // Série active si la date de début est avant la fin du mois
+                boolean startsBeforeEndOfMonth = series.getStartDate() == null || 
+                                              series.getStartDate().isBefore(startOfNextMonth);
+                
+                // Et la date de fin est après le début du mois (ou pas de fin définie)
+                boolean endsAfterStartOfMonth = series.getEndDate() == null || 
+                                             series.getEndDate().isAfter(startOfMonth) || 
+                                             series.getEndDate().isEqual(startOfMonth);
+                
+                // Vérifier que la règle de récurrence est définie
+                boolean hasRecurrence = series.getRecurrence() != null && !series.getRecurrence().isEmpty();
+                
+                return startsBeforeEndOfMonth && endsAfterStartOfMonth && hasRecurrence;
+            })
+            .collect(Collectors.toList());
+    }
 }

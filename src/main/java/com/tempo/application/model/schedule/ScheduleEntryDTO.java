@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ScheduleEntryDTO {
     private Long id;
-    private String type; // "SINGLE" ou "RECURRING"
-    private Long seriesId; // uniquement pour les entrées récurrentes
+    private String type;
+    private Long seriesId; 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private LocalDateTime startDate; // Date de début pour les séries
     
-    private Long duration; // en minutes
+    private Long duration;
     private String recurrence;
     private boolean isActive;
     private Long categoryId;
@@ -48,6 +49,7 @@ public class ScheduleEntryDTO {
         return ScheduleEntryDTO.builder()
                 .id(workTimeSeries.getId())
                 .type("RECURRING")
+                .startDate(workTimeSeries.getStartDate())
                 .startTime(workTimeSeries.getStartTime())  
                 .endTime(workTimeSeries.getEndTime())        
                 .recurrence(workTimeSeries.getRecurrence())

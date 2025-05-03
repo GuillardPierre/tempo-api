@@ -5,6 +5,7 @@ import com.tempo.application.model.user.User;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.WorktimeSeriesService;
 import com.tempo.application.utils.LoggerUtils;
+import com.tempo.application.model.worktimeSeries.WorktimeSeriesResponseDTO;
 
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -125,7 +126,8 @@ public class WorktimeSeriesController {
             worktimeSeriesRequest.setUser(user);
             
             WorktimeSeries updatedSeries = worktimeSeriesService.updateWorktimeSeries(id, worktimeSeriesRequest);
-            return ResponseEntity.ok(updatedSeries);
+            WorktimeSeriesResponseDTO responseDTO = WorktimeSeriesResponseDTO.fromEntity(updatedSeries);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error updating worktime series: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error updating worktime series: " + e.getMessage());

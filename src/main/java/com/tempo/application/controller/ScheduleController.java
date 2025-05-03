@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tempo.application.model.schedule.ScheduleDateEntryDTO;
 import com.tempo.application.model.schedule.ScheduleEntryDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.UserRepository;
@@ -40,7 +41,7 @@ public class ScheduleController {
      * @param date La date au format YYYY-MM-DD
      * @return Une liste combinée des entrées de planification
      */
-    @GetMapping("/{date}")
+    @GetMapping("/day/{date}")
     public ResponseEntity<?> getUserScheduleByDate(@PathVariable String date) {
         try {
             LoggerUtils.info(logger, "Fetching user schedule for date: " + date);
@@ -71,6 +72,42 @@ public class ScheduleController {
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving user schedule: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error retrieving user schedule: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/month/{month}")
+    public ResponseEntity<?> getUserScheduleByMonth(@PathVariable String month) {
+        LoggerUtils.info(logger, "Fetching user schedule for month: " + month);
+            
+        try {
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email);
+            
+            if (user == null) {
+                LoggerUtils.error(logger, "User not found for email: " + email);
+                return ResponseEntity.badRequest().body("User not found");
+            }
+
+            // Convertir la chaîne de date en objet LocalDate
+            LocalDate localDate;
+            try {
+                localDate = LocalDate.parse(month + "-01"); // On suppose que le mois est au format YYYY-MM
+            } catch (Exception e) {
+                LoggerUtils.error(logger, "Invalid month format: " + month);
+                return ResponseEntity.badRequest().body("Invalid month format. Use YYYY-MM format.");
+            }
+
+            List<ScheduleDateEntryDTO> scheduleEntries = scheduleService.getUserScheduleByMonth(localDate, user.getId().longValue());
+            if (scheduleEntries.isEmpty()) {
+                return ResponseEntity.ok("No schedule entries found for the specified month.");
+            } else {
+                return ResponseEntity.ok(scheduleEntries);
+            }
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error retrieving monthly schedule: " + e.getMessage(), e);
+            return ResponseEntity.badRequest().body("Error retrieving monthly schedule: " + e.getMessage());
         }
     }
 }
