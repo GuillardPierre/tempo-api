@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.tempo.application.model.worktime.Worktime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class WorktimeResponseDTO {
     private String categoryName;
     private Long duration; // Durée en minutes
 
-    public static WorktimeResponseDTO fromEntity(com.tempo.application.model.worktime.Worktime worktime) {
+    public static WorktimeResponseDTO fromEntity(Worktime worktime) {
         return WorktimeResponseDTO.builder()
                 .id(worktime.getId())
                 .type("SINGLE")

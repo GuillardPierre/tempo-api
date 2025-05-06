@@ -1,6 +1,7 @@
 package com.tempo.application.service;
 
 import com.tempo.application.model.worktimeSeries.WorktimeSeries;
+import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.CategoryRepository;
 import com.tempo.application.repository.UserRepository;
@@ -61,9 +62,10 @@ public class WorktimeSeriesService {
             throw new IllegalArgumentException("User not found.");
         }
 
-        if (!categoryRepository.existsById(request.getCategory().getId())) {
-            throw new IllegalArgumentException("Category not found.");
-        }
+        // Correction : charger la catégorie complète depuis la base pour garantir que le nom est bien présent
+        Category category = categoryRepository.findById(request.getCategory().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Category not found."));
+        request.setCategory(category);
         
         // Vérifier que la règle de récurrence est fournie
         if (request.getRecurrence() == null) {
@@ -114,11 +116,14 @@ public class WorktimeSeriesService {
         if (request.getRecurrence() != null) {
             existingSeries.setRecurrence(request.getRecurrence());
         }
-        existingSeries.setCategory(request.getCategory());
+
+        // Récupérarion de la catégorie existante pour renvoyer ID + nom
+        Category category = categoryRepository.findById(request.getCategory().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Category not found."));
+        existingSeries.setCategory(category);
         existingSeries.setStartDate(request.getStartDate());
         existingSeries.setEndDate(request.getEndDate());
         
-        // Mise à jour des nouveaux champs startTime et endTime
         if (request.getStartTime() != null) {
             existingSeries.setStartTime(request.getStartTime());
         }

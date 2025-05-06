@@ -52,7 +52,8 @@ public class WorktimeController {
             }
             
             Worktime createdWorktime = worktimeService.createWorktime(worktimeRequest, user.getId());
-            return ResponseEntity.ok(createdWorktime);
+            WorktimeResponseDTO responseDTO = WorktimeResponseDTO.fromEntity(createdWorktime);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error creating worktime: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error creating worktime: " + e.getMessage());

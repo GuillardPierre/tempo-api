@@ -71,7 +71,8 @@ public class WorktimeSeriesController {
             }
             
             WorktimeSeries createdSeries = worktimeSeriesService.createWorktimeSeries(worktimeSeriesRequest);
-            return new ResponseEntity<>(createdSeries, HttpStatus.CREATED);
+            WorktimeSeriesResponseDTO responseDTO = WorktimeSeriesResponseDTO.fromEntity(createdSeries);
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error creating worktime series: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error creating worktime series: " + e.getMessage());
@@ -100,7 +101,8 @@ public class WorktimeSeriesController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
             }
             
-            return ResponseEntity.ok(workTimeSeries);
+            WorktimeSeriesResponseDTO responseDTO = WorktimeSeriesResponseDTO.fromEntity(workTimeSeries);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving worktime series: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error retrieving worktime series: " + e.getMessage());

@@ -93,7 +93,7 @@ public class ScheduleController {
             // Convertir la chaîne de date en objet LocalDate
             LocalDate localDate;
             try {
-                localDate = LocalDate.parse(month + "-01"); // On suppose que le mois est au format YYYY-MM
+                localDate = LocalDate.parse(month);
             } catch (Exception e) {
                 LoggerUtils.error(logger, "Invalid month format: " + month);
                 return ResponseEntity.badRequest().body("Invalid month format. Use YYYY-MM format.");

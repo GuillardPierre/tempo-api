@@ -39,7 +39,7 @@ public class WorktimeService {
             
         Category category;
         
-        if (worktimeRequest.getCategory().getId() == null) {
+        if (worktimeRequest.getCategory().getId() == 0) {
             // Rechercher la catégorie par nom et utilisateur
             category = categoryRepository.findByNameAndUser(worktimeRequest.getCategory().getName(), user);
             
@@ -83,7 +83,7 @@ public class WorktimeService {
             Category category;
             
             // Vérifier si on doit utiliser une catégorie existante ou en créer une nouvelle
-            if (worktimeUpdateRequest.getCategory().getId() == null) {
+            if (worktimeUpdateRequest.getCategory().getId() == 0) {
                 category = categoryRepository.findByNameAndUser(worktimeUpdateRequest.getCategory().getName(), user);
                 System.out.println("category:" + category);
                 if (category == null) {
