@@ -1,0 +1,329 @@
+2025-05-07 22:27:10,797 INFO  [background-preinit] o.h.v.i.u.Version: HV000001: Hibernate Validator 8.0.2.Final
+2025-05-07 22:27:10,920 INFO  [main] o.s.b.StartupInfoLogger: Starting TempoApiApplication using Java 23.0.2 with PID 2112 (C:\Users\pguil\DevProjects\tempo-api-re\target\classes started by pguil in C:\Users\pguil\DevProjects\tempo-api-re)
+2025-05-07 22:27:10,922 INFO  [main] o.s.b.SpringApplication: No active profile set, falling back to 1 default profile: "default"
+2025-05-07 22:27:11,024 INFO  [main] o.s.b.d.c.l.DockerComposeLifecycleManager: Using Docker Compose file C:\Users\pguil\DevProjects\tempo-api-re\compose.yml
+2025-05-07 22:27:12,433 INFO  [main] o.s.b.d.c.l.DockerComposeLifecycleManager: There are already Docker Compose services running, skipping startup
+2025-05-07 22:27:13,860 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate: Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-07 22:27:14,015 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate: Finished Spring Data repository scanning in 132 ms. Found 6 JPA repository interfaces.
+2025-05-07 22:27:15,735 INFO  [main] o.s.b.w.e.t.TomcatWebServer: Tomcat initialized with port 8080 (http)
+2025-05-07 22:27:15,761 INFO  [main] o.a.j.l.DirectJDKLog: Initializing ProtocolHandler ["http-nio-8080"]
+2025-05-07 22:27:15,766 INFO  [main] o.a.j.l.DirectJDKLog: Starting service [Tomcat]
+2025-05-07 22:27:15,768 INFO  [main] o.a.j.l.DirectJDKLog: Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-05-07 22:27:15,892 INFO  [main] o.a.j.l.DirectJDKLog: Initializing Spring embedded WebApplicationContext
+2025-05-07 22:27:15,894 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext: Root WebApplicationContext: initialization completed in 3429 ms
+2025-05-07 22:27:16,419 INFO  [main] o.h.j.i.u.LogHelper: HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-07 22:27:16,533 INFO  [main] o.h.Version: HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-05-07 22:27:16,608 INFO  [main] o.h.c.i.RegionFactoryInitiator: HHH000026: Second-level cache disabled
+2025-05-07 22:27:17,054 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo: No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-07 22:27:17,105 INFO  [main] c.z.h.HikariDataSource: HikariPool-1 - Starting...
+2025-05-07 22:27:17,724 INFO  [main] c.z.h.p.HikariPool: HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7efa366
+2025-05-07 22:27:17,727 INFO  [main] c.z.h.HikariDataSource: HikariPool-1 - Start completed.
+2025-05-07 22:27:17,834 INFO  [main] o.h.e.j.e.i.JdbcEnvironmentInitiator: HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-07 22:27:19,225 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator: HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-07 22:27:19,386 INFO  [main] o.s.o.j.AbstractEntityManagerFactoryBean: Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-07 22:27:20,217 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration: spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-07 22:27:20,312 INFO  [main] o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer: Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-05-07 22:27:20,314 WARN  [main] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer: Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-05-07 22:27:21,090 INFO  [main] o.s.b.a.e.w.EndpointLinksResolver: Exposing 1 endpoint beneath base path '/actuator'
+2025-05-07 22:27:21,850 INFO  [main] o.a.j.l.DirectJDKLog: Starting ProtocolHandler ["http-nio-8080"]
+2025-05-07 22:27:21,881 INFO  [main] o.s.b.w.e.t.TomcatWebServer: Tomcat started on port 8080 (http) with context path '/'
+2025-05-07 22:27:21,896 INFO  [main] o.s.b.StartupInfoLogger: Started TempoApiApplication in 12.025 seconds (process running for 12.733)
+2025-05-07 22:27:33,911 INFO  [http-nio-8080-exec-7] o.a.j.l.DirectJDKLog: Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-07 22:27:33,912 INFO  [http-nio-8080-exec-7] o.s.w.s.FrameworkServlet: Initializing Servlet 'dispatcherServlet'
+2025-05-07 22:27:33,916 INFO  [http-nio-8080-exec-7] o.s.w.s.FrameworkServlet: Completed initialization in 2 ms
+2025-05-07 22:27:34,686 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:27:34,686 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:27:34,686 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 22:27:34,697 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:34,699 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:34,704 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:34,704 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:34,705 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:34,762 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:34,792 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:34,797 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:34,805 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:34,808 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:34,874 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 22:27:34,890 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:34,891 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:35,203 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:27:35,208 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:35,208 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:35,236 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:35,236 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:35,252 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:40,026 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:27:40,033 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:40,065 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:40,085 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:27:40,329 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:27:40,334 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:40,335 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:40,358 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:40,359 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:40,373 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:42,488 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 22:27:42,493 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:42,505 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:42,523 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 22:27:42,714 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:27:42,719 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:42,719 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:42,742 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:42,743 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:42,758 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:43,315 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:27:43,320 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:43,337 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:43,353 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:27:43,608 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:27:43,614 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:43,615 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:43,644 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:43,645 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:43,663 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:54,814 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 22:27:54,819 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:54,835 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 22:27:54,856 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 22:27:55,045 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:27:55,049 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:55,050 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:55,073 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:55,073 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:55,087 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:27:56,032 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:27:56,035 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:56,052 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:27:56,067 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:27:56,296 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:27:56,300 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:27:56,301 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:27:56,323 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:27:56,323 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:27:56,337 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:03,482 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 22:28:03,486 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 22:28:03,497 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 22:28:03,514 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 22:28:03,695 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:28:03,699 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:03,700 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:03,724 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:03,725 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:03,740 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:04,404 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:28:04,408 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:04,424 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:04,439 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:28:04,683 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:28:04,687 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:04,687 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:04,713 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:04,714 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:04,729 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:05,570 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-05
+2025-05-07 22:28:05,574 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-05 and user id: 1
+2025-05-07 22:28:05,591 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-05 and user id: 1
+2025-05-07 22:28:05,606 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Filtering series for day of week: MONDAY
+2025-05-07 22:28:05,864 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-05
+2025-05-07 22:28:05,869 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:05,869 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:05,890 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:05,891 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:05,903 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:06,930 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:28:06,934 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:06,952 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:06,964 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:28:07,184 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:28:07,188 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:07,189 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:07,210 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:07,211 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:07,226 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:17,679 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-05
+2025-05-07 22:28:17,683 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-05 and user id: 1
+2025-05-07 22:28:17,698 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-05 and user id: 1
+2025-05-07 22:28:17,714 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Filtering series for day of week: MONDAY
+2025-05-07 22:28:17,979 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-05
+2025-05-07 22:28:17,983 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:17,983 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:18,005 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:18,006 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:18,018 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:19,186 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:28:19,190 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:19,207 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:19,224 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:28:19,451 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:28:19,455 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:19,455 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:19,476 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:19,477 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:19,490 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:22,633 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 22:28:22,636 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 22:28:22,647 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 22:28:22,663 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 22:28:22,815 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 22:28:22,819 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:22,820 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:22,841 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:22,842 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:22,854 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 22:28:23,829 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 22:28:23,832 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:23,848 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 22:28:23,861 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 22:28:24,085 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 22:28:24,089 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 22:28:24,089 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 22:28:24,110 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 8 worktime entries for the month
+2025-05-07 22:28:24,111 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 22:28:24,125 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:33:16,149 INFO  [background-preinit] o.h.v.i.u.Version: HV000001: Hibernate Validator 8.0.2.Final
+2025-05-07 23:33:16,266 INFO  [main] o.s.b.StartupInfoLogger: Starting TempoApiApplication using Java 23.0.2 with PID 4784 (C:\Users\pguil\DevProjects\tempo-api-re\target\classes started by pguil in C:\Users\pguil\DevProjects\tempo-api-re)
+2025-05-07 23:33:16,268 INFO  [main] o.s.b.SpringApplication: No active profile set, falling back to 1 default profile: "default"
+2025-05-07 23:33:16,374 INFO  [main] o.s.b.d.c.l.DockerComposeLifecycleManager: Using Docker Compose file C:\Users\pguil\DevProjects\tempo-api-re\compose.yml
+2025-05-07 23:33:17,529 INFO  [main] o.s.b.d.c.l.DockerComposeLifecycleManager: There are already Docker Compose services running, skipping startup
+2025-05-07 23:33:18,807 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate: Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-07 23:33:18,932 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate: Finished Spring Data repository scanning in 104 ms. Found 6 JPA repository interfaces.
+2025-05-07 23:33:20,122 INFO  [main] o.s.b.w.e.t.TomcatWebServer: Tomcat initialized with port 8080 (http)
+2025-05-07 23:33:20,142 INFO  [main] o.a.j.l.DirectJDKLog: Initializing ProtocolHandler ["http-nio-8080"]
+2025-05-07 23:33:20,145 INFO  [main] o.a.j.l.DirectJDKLog: Starting service [Tomcat]
+2025-05-07 23:33:20,145 INFO  [main] o.a.j.l.DirectJDKLog: Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-05-07 23:33:20,236 INFO  [main] o.a.j.l.DirectJDKLog: Initializing Spring embedded WebApplicationContext
+2025-05-07 23:33:20,238 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext: Root WebApplicationContext: initialization completed in 2678 ms
+2025-05-07 23:33:20,762 INFO  [main] o.h.j.i.u.LogHelper: HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-07 23:33:20,864 INFO  [main] o.h.Version: HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-05-07 23:33:20,927 INFO  [main] o.h.c.i.RegionFactoryInitiator: HHH000026: Second-level cache disabled
+2025-05-07 23:33:21,315 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo: No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-07 23:33:21,363 INFO  [main] c.z.h.HikariDataSource: HikariPool-1 - Starting...
+2025-05-07 23:33:21,769 INFO  [main] c.z.h.p.HikariPool: HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4c614d8c
+2025-05-07 23:33:21,771 INFO  [main] c.z.h.HikariDataSource: HikariPool-1 - Start completed.
+2025-05-07 23:33:21,903 INFO  [main] o.h.e.j.e.i.JdbcEnvironmentInitiator: HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-07 23:33:23,300 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator: HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-07 23:33:23,456 INFO  [main] o.s.o.j.AbstractEntityManagerFactoryBean: Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-07 23:33:24,264 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration: spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-07 23:33:24,374 INFO  [main] o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer: Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-05-07 23:33:24,375 WARN  [main] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer: Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-05-07 23:33:25,158 INFO  [main] o.s.b.a.e.w.EndpointLinksResolver: Exposing 1 endpoint beneath base path '/actuator'
+2025-05-07 23:33:25,787 INFO  [main] o.a.j.l.DirectJDKLog: Starting ProtocolHandler ["http-nio-8080"]
+2025-05-07 23:33:25,818 INFO  [main] o.s.b.w.e.t.TomcatWebServer: Tomcat started on port 8080 (http) with context path '/'
+2025-05-07 23:33:25,837 INFO  [main] o.s.b.StartupInfoLogger: Started TempoApiApplication in 10.391 seconds (process running for 10.881)
+2025-05-07 23:34:51,014 INFO  [http-nio-8080-exec-1] o.a.j.l.DirectJDKLog: Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-07 23:34:51,015 INFO  [http-nio-8080-exec-1] o.s.w.s.FrameworkServlet: Initializing Servlet 'dispatcherServlet'
+2025-05-07 23:34:51,018 INFO  [http-nio-8080-exec-1] o.s.w.s.FrameworkServlet: Completed initialization in 2 ms
+2025-05-07 23:34:51,681 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Creating new worktime entry
+2025-05-07 23:34:52,467 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 23:34:52,473 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:34:52,475 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:34:52,519 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:34:52,522 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:34:52,560 INFO  [http-nio-8080-exec-4] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:20,617 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 23:37:20,624 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 23:37:20,652 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 23:37:20,681 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 23:37:20,804 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:20,814 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:20,815 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:20,836 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:20,846 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:20,847 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:20,877 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:20,878 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:20,913 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:20,915 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:20,924 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:20,950 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:21,333 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:21,339 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:21,340 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:21,385 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:21,387 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:21,414 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:52,239 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:52,245 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:52,245 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:52,258 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:52,264 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:52,264 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:52,279 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:52,281 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:52,287 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 23:37:52,295 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 23:37:52,306 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:52,306 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:52,307 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:52,319 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 23:37:52,333 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:37:52,358 INFO  [http-nio-8080-exec-2] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 23:37:52,703 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:37:52,707 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:37:52,708 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:37:52,732 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:37:52,733 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:37:52,747 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:55:06,871 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-06
+2025-05-07 23:55:06,877 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-06 and user id: 1
+2025-05-07 23:55:06,896 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-06 and user id: 1
+2025-05-07 23:55:06,914 INFO  [http-nio-8080-exec-3] c.t.a.u.LoggerUtils: Filtering series for day of week: TUESDAY
+2025-05-07 23:55:07,182 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-06
+2025-05-07 23:55:07,186 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:55:07,187 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:55:07,209 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:55:07,210 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:55:07,225 INFO  [http-nio-8080-exec-5] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:55:07,973 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 23:55:07,978 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 23:55:07,998 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 23:55:08,016 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 23:55:08,236 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:55:08,241 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:55:08,242 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:55:08,266 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:55:08,267 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:55:08,282 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:56:14,945 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:56:14,945 INFO  [http-nio-8080-exec-7] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 23:56:14,945 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching user schedule for date: 2025-05-07
+2025-05-07 23:56:14,953 INFO  [http-nio-8080-exec-7] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 23:56:14,953 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching worktimes for date: 2025-05-07 and user id: 1
+2025-05-07 23:56:14,953 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:56:14,956 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:56:14,992 INFO  [http-nio-8080-exec-7] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 23:56:14,992 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Fetching active worktime series for date: 2025-05-07 and user id: 1
+2025-05-07 23:56:14,992 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:56:14,999 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:56:15,001 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:56:15,014 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:56:15,016 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:56:15,037 INFO  [http-nio-8080-exec-7] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 23:56:15,037 INFO  [http-nio-8080-exec-8] c.t.a.u.LoggerUtils: Filtering series for day of week: WEDNESDAY
+2025-05-07 23:56:15,064 INFO  [http-nio-8080-exec-6] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:56:15,075 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:56:15,077 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:56:15,119 INFO  [http-nio-8080-exec-10] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month
+2025-05-07 23:56:15,687 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching user schedule for month: 2025-05-07
+2025-05-07 23:56:15,691 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Getting schedule for month: MAY and user id: 1
+2025-05-07 23:56:15,692 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching worktimes for month: MAY and user id: 1
+2025-05-07 23:56:15,720 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 9 worktime entries for the month
+2025-05-07 23:56:15,721 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Fetching active worktime series for month: MAY and user id: 1
+2025-05-07 23:56:15,737 INFO  [http-nio-8080-exec-1] c.t.a.u.LoggerUtils: Found 2 worktime series entries for the month

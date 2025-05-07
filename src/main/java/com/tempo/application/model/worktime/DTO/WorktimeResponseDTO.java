@@ -20,7 +20,8 @@ public class WorktimeResponseDTO {
     private boolean isActive;
     private Integer categoryId;
     private String categoryName;
-    private Long duration; // Durée en minutes
+    private Long duration;
+
 
     public static WorktimeResponseDTO fromEntity(Worktime worktime) {
         return WorktimeResponseDTO.builder()

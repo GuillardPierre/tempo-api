@@ -63,6 +63,12 @@ public class WorktimeService {
         worktime.setEndTime(worktimeRequest.getEndTime());
         worktime.setCategory(category);
         worktime.setUser(user);
+        // Gestion du compteur en cours : si endTime est null, active = true
+        if (worktimeRequest.getEndTime() == null) {
+            worktime.setActive(true);
+        } else {
+            worktime.setActive(false);
+        }
         return worktimeRepository.save(worktime);
     }
 
@@ -157,5 +163,9 @@ public class WorktimeService {
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
             
         return worktimeRepository.findByStartTimeBetweenAndUser(startOfMonth, endOfMonth, user);
+    }
+
+    public List<Worktime> getAllActiveUserWorktimes(int userId) {
+        return worktimeRepository.findByUserIdAndActiveTrue(userId);
     }
 }

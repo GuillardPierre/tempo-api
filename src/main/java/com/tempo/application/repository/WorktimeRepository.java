@@ -19,4 +19,7 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     
     // Retourne tous les worktimes pour une plage de dates et un utilisateur spécifique
     List<Worktime> findByStartTimeBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
+
+    // Retourne tous les worktimes actifs pour un utilisateur
+    List<Worktime> findByUserIdAndActiveTrue(Integer userId);
 }
