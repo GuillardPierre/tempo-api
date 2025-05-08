@@ -144,24 +144,4 @@ public class WorktimeController {
             return ResponseEntity.badRequest().body("Error deleting worktime: " + e.getMessage());
         }
     }
-
-    @GetMapping("/user/active")
-    public ResponseEntity<?> getActiveUserWorktimes() {
-        try {
-            // Récupérer l'utilisateur connecté
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
-            User user = userRepository.findByEmail(email);
-
-            if (user == null) {
-                return ResponseEntity.badRequest().body("User not found");
-            }
-
-            List<Worktime> activeWorktimes = worktimeService.getAllActiveUserWorktimes(user.getId());
-            return ResponseEntity.ok(activeWorktimes);
-        } catch (Exception e) {
-            LoggerUtils.error(logger, "Error retrieving user active worktimes: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error retrieving active worktimes: " + e.getMessage());
-        }
-    }
 }

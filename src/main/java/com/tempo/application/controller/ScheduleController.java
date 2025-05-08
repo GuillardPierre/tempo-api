@@ -45,8 +45,7 @@ public class ScheduleController {
     public ResponseEntity<?> getUserScheduleByDate(@PathVariable String date) {
         try {
             LoggerUtils.info(logger, "Fetching user schedule for date: " + date);
-            
-            // Récupérer l'utilisateur connecté
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
@@ -56,7 +55,6 @@ public class ScheduleController {
                 return ResponseEntity.badRequest().body("User not found");
             }
             
-            // Convertir la chaîne de date en objet LocalDate
             LocalDate localDate;
             try {
                 localDate = LocalDate.parse(date);
@@ -65,8 +63,7 @@ public class ScheduleController {
                 return ResponseEntity.badRequest().body("Invalid date format. Use YYYY-MM-DD format.");
             }
             
-            // Récupérer les entrées de planification combinées
-            List<ScheduleEntryDTO> scheduleEntries = scheduleService.getUserScheduleByDate(localDate, user.getId().longValue());
+            List<ScheduleEntryDTO> scheduleEntries = scheduleService.getUserScheduleByDate(localDate, user.getId());
             
             return ResponseEntity.ok(scheduleEntries);
         } catch (Exception e) {
@@ -99,7 +96,7 @@ public class ScheduleController {
                 return ResponseEntity.badRequest().body("Invalid month format. Use YYYY-MM format.");
             }
 
-            List<ScheduleDateEntryDTO> scheduleEntries = scheduleService.getUserScheduleByMonth(localDate, user.getId().longValue());
+            List<ScheduleDateEntryDTO> scheduleEntries = scheduleService.getUserScheduleByMonth(localDate, user.getId());
             if (scheduleEntries.isEmpty()) {
                 return ResponseEntity.ok("No schedule entries found for the specified month.");
             } else {

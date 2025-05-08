@@ -58,14 +58,14 @@ public class Worktime {
     @Transient
     public Long getDuration() {
         if (startTime == null || endTime == null) {
-            return 0L;
+            return null;
         }
 
         try {
             Duration duration = Duration.between(startTime, endTime);
             return duration.toMinutes();
         } catch (Exception e) {
-            return 0L;
+            return null;
         }
     }
 

@@ -12,6 +12,7 @@ import com.tempo.application.utils.LoggerUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,28 +34,41 @@ public class ScheduleService {
      * @param userId L'ID de l'utilisateur
      * @return Une liste combinée des entrées de planification
      */
-    public List<ScheduleEntryDTO> getUserScheduleByDate(LocalDate date, Long userId) {
+    public List<ScheduleEntryDTO> getUserScheduleByDate(LocalDate date, Integer userId) {
         List<ScheduleEntryDTO> schedule = new ArrayList<>();
 
         // Récupérer les Worktime pour cette date
         List<Worktime> worktimes = worktimeService.getAllUserWorktimesByDateAndUserId(date, userId);
         List<ScheduleEntryDTO> worktimeDTOs = worktimes.stream()
                 .map(ScheduleEntryDTO::fromWorktime)
+                .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
         schedule.addAll(worktimeDTOs);
 
         // Récupérer les WorktimeSeries actives pour cette date
-        List<WorktimeSeries> activeWorkTimeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForDateAndUser(date, userId);
+        List<WorktimeSeries> activeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForDateAndUser(date, userId);
         
         // Filtrer les séries en fonction du jour de la semaine (BYDAY dans la règle de récurrence)
-        List<WorktimeSeries> filteredSeries = filterSeriesByDayOfWeek(activeWorkTimeSeries, date);
+        List<WorktimeSeries> filteredSeries = filterSeriesByDayOfWeek(activeSeries, date);
         
         List<ScheduleEntryDTO> workTimeSeriesDTOs = filteredSeries.stream()
                 .map(ScheduleEntryDTO::fromWorkTimeSeries)
                 .collect(Collectors.toList());
         schedule.addAll(workTimeSeriesDTOs);
 
-        return schedule;
+        // Récupérer les Worktime actifs pour TOUTE les dates
+        List<Worktime> activeWorktimes = worktimeService.findByUserIdAndActiveTrueAndEndTimeIsNull(date, userId);
+        List<ScheduleEntryDTO> activeWorktimeDTOs = activeWorktimes.stream()
+                .map(ScheduleEntryDTO::fromActiveWorktime)
+                .collect(Collectors.toList());
+        schedule.addAll(activeWorktimeDTOs);
+
+        return schedule.stream()
+            .sorted(Comparator.comparing(
+                entry -> entry.getStartTime() != null ? entry.getStartTime().toLocalTime() : null,
+                Comparator.nullsLast(Comparator.naturalOrder())
+            ))
+            .collect(Collectors.toList());
     }
     
     /**
@@ -118,7 +132,7 @@ public class ScheduleService {
      * @param userId L'ID de l'utilisateur
      * @return Une liste combinée des entrées de planification du mois
      */
-    public List<ScheduleDateEntryDTO> getUserScheduleByMonth(LocalDate date, Long userId) {
+    public List<ScheduleDateEntryDTO> getUserScheduleByMonth(LocalDate date, Integer userId) {
         LoggerUtils.info(logger, "Getting schedule for month: " + date.getMonth() + " and user id: " + userId);
         List<ScheduleDateEntryDTO> schedule = new ArrayList<>();
 
@@ -132,12 +146,12 @@ public class ScheduleService {
         schedule.addAll(worktimeDTOs);
 
         // Récupérer les WorktimeSeries actives pour ce mois
-        List<WorktimeSeries> activeWorkTimeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForMonthAndUser(date, userId);
-        LoggerUtils.info(logger, "Found " + activeWorkTimeSeries.size() + " worktime series entries for the month");
+        List<WorktimeSeries> activeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForMonthAndUser(date, userId);
+        LoggerUtils.info(logger, "Found " + activeSeries.size() + " worktime series entries for the month");
         
         // Pour les séries mensuelles, nous n'avons pas besoin de filtrer par jour de la semaine
         // car nous voulons toutes les séries actives durant le mois
-        List<ScheduleDateEntryDTO> workTimeSeriesDTOs = activeWorkTimeSeries.stream()
+        List<ScheduleDateEntryDTO> workTimeSeriesDTOs = activeSeries.stream()
                 .map(ScheduleDateEntryDTO::fromWorktimeSeries)
                 .collect(Collectors.toList());
         schedule.addAll(workTimeSeriesDTOs);

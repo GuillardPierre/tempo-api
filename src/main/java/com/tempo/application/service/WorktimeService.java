@@ -141,31 +141,25 @@ public class WorktimeService {
      * @param userId L'ID de l'utilisateur
      * @return Une liste des créneaux horaires pour cette date et cet utilisateur
      */
-    public List<Worktime> getAllUserWorktimesByDateAndUserId(LocalDate date, Long userId) {
+    public List<Worktime> getAllUserWorktimesByDateAndUserId(LocalDate date, Integer userId) {
         LoggerUtils.info(logger, "Fetching worktimes for date: " + date + " and user id: " + userId);
-        
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
-        
-        User user = userRepository.findById(Integer.valueOf(userId.intValue()))
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            
         return worktimeRepository.findByStartTimeBetweenAndUser(startOfDay, endOfDay, user);
     }
 
-    public List<Worktime> getAllUserWorktimesByMonthAndUserId(LocalDate date, Long userId) {
+    public List<Worktime> getAllUserWorktimesByMonthAndUserId(LocalDate date, Integer userId) {
         LoggerUtils.info(logger, "Fetching worktimes for month: " + date.getMonth() + " and user id: " + userId);
-        
         LocalDateTime startOfMonth = date.withDayOfMonth(1).atStartOfDay();
         LocalDateTime endOfMonth = date.plusMonths(1).withDayOfMonth(1).atStartOfDay();
-        
-        User user = userRepository.findById(Integer.valueOf(userId.intValue()))
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            
         return worktimeRepository.findByStartTimeBetweenAndUser(startOfMonth, endOfMonth, user);
     }
 
-    public List<Worktime> getAllActiveUserWorktimes(int userId) {
-        return worktimeRepository.findByUserIdAndActiveTrue(userId);
+    public List<Worktime> findByUserIdAndActiveTrueAndEndTimeIsNull(LocalDate date, Integer userId) {
+        return worktimeRepository.findByUserIdAndActiveTrueAndEndTimeIsNull(userId);
     }
 }
