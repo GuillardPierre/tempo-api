@@ -21,7 +21,6 @@ import com.tempo.application.model.refreshToken.DTO.RefreshTokenDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.model.user.UserCreateDto;
 import com.tempo.application.model.user.UserDto;
-import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.RefreshTokenService;
 import com.tempo.application.service.UserService;
 import com.tempo.application.utils.LoggerUtils;
