@@ -18,7 +18,7 @@ services:
       - DB_URL=jdbc:mysql://mysql:3306/mydatabase
       - DB_USERNAME=myuser
       - DB_PASSWORD=secret
-      - APP_SECRET_KEY=maSuperCleUltraSecrete
+      - APP_SECRET_KEY=secretazertyuiopqsdfghjklmwxcvbnazertyuiop
     ports:
       - '8080:8080'
     depends_on:

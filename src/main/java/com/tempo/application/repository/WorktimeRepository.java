@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tempo.application.model.user.User;
 import com.tempo.application.model.worktime.Worktime;
+import com.tempo.application.model.category.Category;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
 
     // Retourne tous les worktimes actifs pour un utilisateur
     List<Worktime> findByUserIdAndActiveTrueAndEndTimeIsNull(Integer userId);
+
+    void deleteByCategory(Category category);
 }

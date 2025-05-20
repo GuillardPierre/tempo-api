@@ -1,6 +1,7 @@
 package com.tempo.application.controller;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -97,11 +98,7 @@ public class ScheduleController {
             }
 
             List<ScheduleDateEntryDTO> scheduleEntries = scheduleService.getUserScheduleByMonth(localDate, user.getId());
-            if (scheduleEntries.isEmpty()) {
-                return ResponseEntity.ok("No schedule entries found for the specified month.");
-            } else {
-                return ResponseEntity.ok(scheduleEntries);
-            }
+            return ResponseEntity.ok(scheduleEntries);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving monthly schedule: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error retrieving monthly schedule: " + e.getMessage());
