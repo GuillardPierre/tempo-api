@@ -21,6 +21,8 @@ public class ScheduleDateEntryDTO {
     private LocalDateTime endTime;
     private Boolean isActive;
     private String recurrence;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
 
     public static ScheduleDateEntryDTO fromWorktime(Worktime worktime) {
@@ -41,6 +43,8 @@ public class ScheduleDateEntryDTO {
                 .endTime(workTimeSeries.getEndTime())
                 .isActive(workTimeSeries.isActive())
                 .recurrence(workTimeSeries.getRecurrence())
+                .startDate(workTimeSeries.getStartDate())
+                .endDate(workTimeSeries.getEndDate())
                 .build();
     }
 }

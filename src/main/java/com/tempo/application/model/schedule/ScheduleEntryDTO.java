@@ -17,9 +17,10 @@ public class ScheduleEntryDTO {
     private Long id;
     private String type;
     private Long seriesId; 
-    private LocalDateTime startTime;
+    private LocalDateTime startTime; // heure de début
     private LocalDateTime endTime;
     private LocalDateTime startDate; // Date de début pour les séries
+    private LocalDateTime endDate;
     
     private Long duration;
     private String recurrence;
@@ -53,6 +54,7 @@ public class ScheduleEntryDTO {
                 .id(workTimeSeries.getId())
                 .type("RECURRING")
                 .startDate(workTimeSeries.getStartDate())
+                .endDate(workTimeSeries.getEndDate())
                 .startTime(workTimeSeries.getStartTime())  
                 .endTime(workTimeSeries.getEndTime())        
                 .recurrence(workTimeSeries.getRecurrence())

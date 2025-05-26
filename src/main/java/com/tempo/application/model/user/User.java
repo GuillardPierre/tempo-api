@@ -31,12 +31,7 @@ public class User {
     private String email;
 
     private String password;
-
-    // @JsonManagedReference(value = "user-category")
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Category> categories;
     
-    // @JsonManagedReference(value = "user-worktime")
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Worktime> worktimes;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Worktime> worktimes;
 }
