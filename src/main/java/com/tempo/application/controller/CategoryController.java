@@ -45,6 +45,12 @@ public class CategoryController {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email);
 
+        List<Category> categories = categoryService.findAllByUserId(user.getId());
+
+        if (categories.contains(category)) {
+            return ResponseEntity.status(403).body("Vous ne pouvez pas créer une catégorie avec le même nom");
+        }
+
         Category category1 = new Category();
         category1.setName(category.getName());
         category1.setUser(user);
