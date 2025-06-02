@@ -24,9 +24,13 @@ public class WorktimeSeries {
     private Long id;
 
     @ManyToOne(optional = false)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne(optional = false)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private Category category;
 
     @NotNull(message = "StartDate cannot be null")
@@ -46,6 +50,8 @@ public class WorktimeSeries {
     private boolean active = true;
 
     @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private List<RecurrenceException> exceptions;
 
     @Transient

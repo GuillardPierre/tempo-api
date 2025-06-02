@@ -29,5 +29,7 @@ public class Category {
     @JsonBackReference(value = "user-category")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private User user;
 }

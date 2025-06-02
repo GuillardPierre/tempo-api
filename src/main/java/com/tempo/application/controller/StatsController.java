@@ -24,13 +24,19 @@ public class StatsController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/categories")
-    public List<CategoryStatDTO> getCategoryStats( 
+    @GetMapping("/")
+    public Object getStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam(defaultValue = "week") String type) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email);
-        return statsService.getCategoryStats(user.getId(), from, to);
+        List<CategoryStatDTO> categories = statsService.getCategoryStats(user.getId(), from, to);
+        Object total = statsService.getTotalWorkTime(user.getId(), from, to, type);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("categories", categories);
+        result.put("total", total);
+        return result;
     }
 } 

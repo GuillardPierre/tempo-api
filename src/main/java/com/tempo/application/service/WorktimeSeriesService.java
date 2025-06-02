@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+
 @Service
 public class WorktimeSeriesService {
 
@@ -37,6 +39,7 @@ public class WorktimeSeriesService {
      * @param request La série à créer
      * @return La série créée avec son ID généré
      */
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public WorktimeSeries createWorktimeSeries(WorktimeSeries request) {
         LoggerUtils.info(logger, "Creating new worktime series");
         
@@ -82,6 +85,7 @@ public class WorktimeSeriesService {
      * @param request La série avec les nouvelles valeurs
      * @return La série mise à jour
      */
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public WorktimeSeries updateWorktimeSeries(Long id, WorktimeSeries request) {
         LoggerUtils.info(logger, "Updating worktime series with id: " + id);
         
@@ -142,6 +146,7 @@ public class WorktimeSeriesService {
      * @param id L'identifiant de la série à supprimer
      * @param userId L'identifiant de l'utilisateur (pour vérification d'autorisation)
      */
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public void deleteWorktimeSeries(Long id, Integer userId) {
         LoggerUtils.info(logger, "Deleting worktime series with id: " + id);
         

@@ -42,5 +42,69 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     List<CategoryStatDTO> getCategoryStatsByUserAndPeriod(@Param("userId") Integer userId,
                                                           @Param("from") LocalDateTime from,
                                                           @Param("to") LocalDateTime to);
+
+    @Query(
+      value = "SELECT DATE(w.start_time) as date, " +
+              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+              "FROM worktime w " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.start_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "GROUP BY DATE(w.start_time)",
+      nativeQuery = true)
+    List<Object[]> getTotalWorktimeByUserAndPeriodGroupByDay(
+        @Param("userId") Integer userId,
+        @Param("from") LocalDateTime from,
+        @Param("to") LocalDateTime to
+    );
+
+    @Query(
+      value = "SELECT DATE_FORMAT(w.start_time, '%Y-%m') as period, " +
+              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+              "FROM worktime w " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.start_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "GROUP BY period",
+      nativeQuery = true)
+    List<Object[]> getTotalWorktimeByUserAndPeriodGroupByMonth(
+        @Param("userId") Integer userId,
+        @Param("from") LocalDateTime from,
+        @Param("to") LocalDateTime to
+    );
+
+    @Query(
+      value = "SELECT DATE_FORMAT(w.start_time, '%Y') as period, " +
+              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+              "FROM worktime w " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.start_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "GROUP BY period",
+      nativeQuery = true)
+    List<Object[]> getTotalWorktimeByUserAndPeriodGroupByYear(
+        @Param("userId") Integer userId,
+        @Param("from") LocalDateTime from,
+        @Param("to") LocalDateTime to
+    );
+
+    @Query(
+      value = "SELECT YEAR(w.start_time) as y, WEEK(w.start_time, 1) as w, " +
+              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+              "FROM worktime w " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.start_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "GROUP BY y, w",
+      nativeQuery = true)
+    List<Object[]> getTotalWorktimeByUserAndPeriodGroupByWeek(
+        @Param("userId") Integer userId,
+        @Param("from") LocalDateTime from,
+        @Param("to") LocalDateTime to
+    );
                                                           
 }

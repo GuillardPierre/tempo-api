@@ -1,6 +1,7 @@
 services:
   mysql:
     image: 'mysql:latest'
+    # image: 'arm64v8/mysql:latest'
     environment:
       - 'MYSQL_DATABASE=mydatabase'
       - 'MYSQL_PASSWORD=secret'

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
 
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
@@ -33,6 +34,7 @@ public class WorktimeService {
     @Autowired
     private UserRepository userRepository;
 
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public Worktime createWorktime(WorktimeRequestDTO worktimeRequest, Integer userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -72,6 +74,7 @@ public class WorktimeService {
         return worktimeRepository.save(worktime);
     }
 
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public void deleteWorktimeById(int id) {
         if (worktimeRepository.existsById(id)) {
             worktimeRepository.deleteById(id);
@@ -80,6 +83,7 @@ public class WorktimeService {
         }
     }
 
+    @CacheEvict(value = "categoryStats", allEntries = true)
     public Worktime updateWorktime(WorktimeRequestDTO worktimeUpdateRequest, Integer id) {
         if (worktimeRepository.existsById(id)) {
             

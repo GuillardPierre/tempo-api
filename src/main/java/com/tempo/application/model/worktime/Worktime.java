@@ -34,6 +34,8 @@ public class Worktime {
     private int id;
 
     @ManyToOne
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private WorktimeSeries series;   // null si créneau unique
 
     // Format ISO-8601 (2025-04-26T13:30)
@@ -47,9 +49,13 @@ public class Worktime {
     private String recurrencePattern;
 
     @ManyToOne(optional = false)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne(optional = false)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private Category category;
 
     @Builder.Default
