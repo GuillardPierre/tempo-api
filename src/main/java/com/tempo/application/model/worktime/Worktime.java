@@ -3,7 +3,6 @@ package com.tempo.application.model.worktime;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
 
@@ -20,6 +19,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Data
@@ -54,6 +55,7 @@ public class Worktime {
     private User user;
 
     @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     private Category category;

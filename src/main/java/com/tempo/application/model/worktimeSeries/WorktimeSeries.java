@@ -10,6 +10,8 @@ import com.tempo.application.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Représente une série récurrente de créneaux.
@@ -29,6 +31,7 @@ public class WorktimeSeries {
     private User user;
 
     @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     private Category category;
