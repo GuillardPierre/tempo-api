@@ -17,7 +17,6 @@ public class WorktimeSeriesResponseDTO {
     private LocalDateTime endDate;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private boolean isActive;
     private int categoryId;
     private String categoryName;
     private String recurrence;
@@ -31,7 +30,6 @@ public class WorktimeSeriesResponseDTO {
                 .endDate(series.getEndDate())
                 .startTime(series.getStartTime())
                 .endTime(series.getEndTime())
-                .isActive(series.isActive())
                 .categoryId(series.getCategory().getId())
                 .categoryName(series.getCategory().getName())
                 .recurrence(series.getRecurrence())

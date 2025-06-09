@@ -19,5 +19,10 @@ RUN chmod +x /wait-for-it.sh
 # Variables d'environnement (optionnel)
 ENV JAVA_OPTS=""
 
+# Création du script de démarrage
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'java $JAVA_OPTS -jar /app/app.jar' >> /start.sh && \
+    chmod +x /start.sh
+
 # Commande de lancement
-ENTRYPOINT ["sh", "-c", "/wait-for-it.sh mysql:3306 -- java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["/wait-for-it.sh", "mysql:3306", "--", "/start.sh"]

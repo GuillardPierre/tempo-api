@@ -1,6 +1,9 @@
 package com.tempo.application.controller;
 
+import com.tempo.application.error.ApiError;
 import com.tempo.application.model.recurrenceException.RecurrenceException;
+import com.tempo.application.model.recurrenceException.RecurrenceExceptionCreateDTO;
+import com.tempo.application.model.recurrenceException.RecurrenceExceptionDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.RecurrenceExceptionService;
@@ -28,36 +31,61 @@ public class RecurrenceExceptionController {
     
     @Autowired
     private UserRepository userRepository;
-    
+
     /**
-     * Crée une nouvelle exception de récurrence (période de pause)
+     * Récupère toutes les exceptions de récurrence
      */
-    @PostMapping("/create")
-    public ResponseEntity<?> createRecurrenceException(@Valid @RequestBody RecurrenceException recurrenceException) {
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllRecurrenceExceptions() {
         try {
-            LoggerUtils.info(logger, "Creating new recurrence exception");
-            
             // Récupérer l'utilisateur connecté
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
             
             if (user == null) {
-                LoggerUtils.error(logger, "User not found for email: " + email);
-                return ResponseEntity.badRequest().body("User not found");
+                ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
+                return ResponseEntity.badRequest().body(error);
             }
+
+            // Récupérer les exceptions pour l'utilisateur (et celles sans séries)
+            List<RecurrenceException> exceptions = recurrenceExceptionService.getAllRecurrenceExceptionsByUserId(user.getId());
             
-            // Vérifier que l'utilisateur est propriétaire de la série
-            if (recurrenceException.getSeries().getUser() != null && 
-                !recurrenceException.getSeries().getUser().getId().equals(user.getId())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only create exceptions for your own series");
-            }
+            // Convertir toutes les exceptions en DTO
+            List<RecurrenceExceptionDTO> allExceptions = exceptions.stream()
+                .map(RecurrenceExceptionDTO::fromEntity)
+                .toList();
             
-            RecurrenceException createdException = recurrenceExceptionService.createRecurrenceException(recurrenceException);
-            return new ResponseEntity<>(createdException, HttpStatus.CREATED);
+            return ResponseEntity.ok(allExceptions);
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error retrieving all recurrence exceptions: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
+    /**
+     * Crée une nouvelle exception de récurrence (période de pause)
+     */
+    @PostMapping("/create")
+    public ResponseEntity<?> createRecurrenceException(@Valid @RequestBody RecurrenceExceptionCreateDTO dto) {
+        try {
+            LoggerUtils.info(logger, "Creating new recurrence exception");
+
+            RecurrenceException createdEntity = recurrenceExceptionService.createRecurrenceException(
+                dto.getPauseStart(), dto.getPauseEnd()
+            );
+            
+            RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(createdEntity);
+            return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            LoggerUtils.error(logger, "Validation error creating recurrence exception: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), "VALIDATION_ERROR");
+            return ResponseEntity.badRequest().body(error);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error creating recurrence exception: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error creating recurrence exception: " + e.getMessage());
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
     
@@ -73,20 +101,26 @@ public class RecurrenceExceptionController {
             User user = userRepository.findByEmail(email);
             
             if (user == null) {
-                return ResponseEntity.badRequest().body("User not found");
+                ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
+                return ResponseEntity.badRequest().body(error);
             }
             
             RecurrenceException exception = recurrenceExceptionService.getRecurrenceExceptionById(id);
             
             // Vérifier que l'utilisateur est autorisé à voir cette exception
-            if (!exception.getSeries().getUser().getId().equals(user.getId())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+            boolean isAuthorized = exception.getSeries().stream()
+                .anyMatch(series -> series.getUser() != null && series.getUser().getId().equals(user.getId()));
+            if (!isAuthorized) {
+                ApiError error = new ApiError(HttpStatus.FORBIDDEN, "Access denied", "ACCESS_DENIED");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
             }
             
-            return ResponseEntity.ok(exception);
+            RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(exception);
+            return ResponseEntity.ok(responseDto);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving recurrence exception: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error retrieving recurrence exception: " + e.getMessage());
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
     
@@ -169,6 +203,64 @@ public class RecurrenceExceptionController {
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving recurrence exceptions: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error retrieving recurrence exceptions: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Vérifie si une série peut être liée à une exception
+     */
+    @GetMapping("/check-link/{seriesId}/{exceptionId}")
+    public ResponseEntity<?> checkSeriesLink(
+            @PathVariable Integer seriesId,
+            @PathVariable Integer exceptionId) {
+        try {
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email);
+            
+            if (user == null) {
+                ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            boolean canLink = recurrenceExceptionService.canLinkSeriesToException(seriesId, exceptionId, user.getId());
+            return ResponseEntity.ok(canLink);
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error checking series link: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    /**
+     * Lie une série à une exception
+     */
+    @PostMapping("/link/{seriesId}/{exceptionId}")
+    public ResponseEntity<?> linkSeriesToException(
+            @PathVariable Integer seriesId,
+            @PathVariable Integer exceptionId) {
+        try {
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email);
+            
+            if (user == null) {
+                ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            recurrenceExceptionService.linkSeriesToException(seriesId, exceptionId, user.getId());
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            LoggerUtils.error(logger, "Validation error linking series to exception: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), "VALIDATION_ERROR");
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error linking series to exception: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }

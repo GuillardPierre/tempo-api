@@ -10,9 +10,12 @@ import com.tempo.application.utils.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecurrenceExceptionService {
@@ -28,25 +31,129 @@ public class RecurrenceExceptionService {
     /**
      * Crée une nouvelle exception de récurrence (période de pause)
      * 
-     * @param recurrenceException La requête de création d'exception
-     * @return L'exception créée avec son ID
+     * @param pauseStart Date de début de la pause
+     * @param pauseEnd Date de fin de la pause
+     * @return L'exception créée
      */
-    public RecurrenceException createRecurrenceException(RecurrenceException recurrenceException) {
+    @Transactional
+    public RecurrenceException createRecurrenceException(LocalDateTime pauseStart, LocalDateTime pauseEnd) {
         LoggerUtils.info(logger, "Creating new recurrence exception");
         
-        // Vérifier que les dates sont cohérentes
-        if (recurrenceException.getPauseStart() != null && recurrenceException.getPauseEnd() != null &&
-            recurrenceException.getPauseStart().isAfter(recurrenceException.getPauseEnd())) {
+        if (pauseStart != null && pauseEnd != null && pauseStart.isAfter(pauseEnd)) {
             throw new IllegalArgumentException("Start date must be before end date.");
         }
-        
-        // Vérifier que la série existe
-        WorktimeSeries series = workTimeSeriesRepository.findById(recurrenceException.getSeries().getId().intValue())
-            .orElseThrow(() -> new RuntimeException("Worktime series not found with id: " + recurrenceException.getSeries().getId()));
-        
-        recurrenceException.setSeries(series);
-        
-        return recurrenceExceptionRepository.save(recurrenceException);
+
+        // Vérifier s'il existe déjà des exceptions qui se chevauchent
+        List<RecurrenceException> overlappingExceptions = recurrenceExceptionRepository.findOverlappingExceptions(
+            pauseStart, pauseEnd
+        );
+
+        if (!overlappingExceptions.isEmpty()) {
+            RecurrenceException existingException = overlappingExceptions.get(0);
+            throw new IllegalArgumentException(
+                String.format("Une exception existe déjà qui chevauche cette période (du %s au %s).",
+                    existingException.getPauseStart().toString(),
+                    existingException.getPauseEnd().toString())
+            );
+        }
+
+        // Créer l'exception
+        RecurrenceException newException = RecurrenceException.builder()
+            .pauseStart(pauseStart)
+            .pauseEnd(pauseEnd)
+            .series(new ArrayList<>())
+            .build();
+
+        // Sauvegarder l'exception pour obtenir son ID
+        RecurrenceException savedException = recurrenceExceptionRepository.save(newException);
+
+        // Rechercher toutes les séries qui pourraient être concernées par cette exception
+        List<WorktimeSeries> overlappingSeries = workTimeSeriesRepository.findAll().stream()
+            .filter(series -> {
+                // Ignorer les séries qui ont ignoreExceptions à true
+                if (Boolean.TRUE.equals(series.getIgnoreExceptions())) {
+                    return false;
+                }
+
+                // Vérifier si la série est active pendant la période de l'exception
+                boolean isActiveStart = series.getStartDate().isBefore(pauseEnd);
+                boolean isActiveEnd = series.getEndDate() == null || series.getEndDate().isAfter(pauseStart);
+
+                return isActiveStart && isActiveEnd;
+            })
+            .toList();
+
+        if (!overlappingSeries.isEmpty()) {
+            LoggerUtils.info(logger, String.format(
+                "Found %d series that overlap with this exception period", 
+                overlappingSeries.size()
+            ));
+
+            // Mettre à jour les relations
+            savedException.getSeries().addAll(overlappingSeries);
+            for (WorktimeSeries series : overlappingSeries) {
+                series.getExceptions().add(savedException);
+            }
+
+            // Sauvegarder les mises à jour
+            workTimeSeriesRepository.saveAll(overlappingSeries);
+            savedException = recurrenceExceptionRepository.save(savedException);
+        }
+
+        return savedException;
+    }
+
+    /**
+     * Vérifie si une série peut être liée à une exception de récurrence
+     * 
+     * @param seriesId ID de la série
+     * @param exceptionId ID de l'exception
+     * @param userId ID de l'utilisateur pour vérification
+     * @return true si la liaison est possible, false sinon
+     */
+    public boolean canLinkSeriesToException(Integer seriesId, Integer exceptionId, Integer userId) {
+        WorktimeSeries series = workTimeSeriesRepository.findById(seriesId)
+            .orElseThrow(() -> new RuntimeException("Worktime series not found with id: " + seriesId));
+            
+        // Vérifier que l'utilisateur est le propriétaire de la série
+        if (!series.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("You can only link exceptions to your own series.");
+        }
+
+        // Si la série ignore les exceptions, pas besoin de vérifier plus loin
+        if (Boolean.TRUE.equals(series.getIgnoreExceptions())) {
+            return false;
+        }
+
+        RecurrenceException exception = recurrenceExceptionRepository.findById(exceptionId)
+            .orElseThrow(() -> new RuntimeException("Recurrence exception not found with id: " + exceptionId));
+
+        // Vérifier si la série chevauche la période de l'exception
+        return series.getStartDate().isBefore(exception.getPauseEnd()) && 
+               (series.getEndDate() == null || series.getEndDate().isAfter(exception.getPauseStart()));
+    }
+
+    /**
+     * Lie une série à une exception de récurrence
+     * 
+     * @param seriesId ID de la série
+     * @param exceptionId ID de l'exception
+     * @param userId ID de l'utilisateur pour vérification
+     */
+    @Transactional
+    public void linkSeriesToException(Integer seriesId, Integer exceptionId, Integer userId) {
+        if (!canLinkSeriesToException(seriesId, exceptionId, userId)) {
+            throw new IllegalArgumentException("Cannot link this series to this exception.");
+        }
+
+        WorktimeSeries series = workTimeSeriesRepository.findById(seriesId).get();
+        RecurrenceException exception = recurrenceExceptionRepository.findById(exceptionId).get();
+
+        series.getExceptions().add(exception);
+        exception.getSeries().add(series);
+
+        workTimeSeriesRepository.save(series);
+        recurrenceExceptionRepository.save(exception);
     }
     
     /**
@@ -57,14 +164,18 @@ public class RecurrenceExceptionService {
      * @param userId L'ID de l'utilisateur pour vérification d'autorisation
      * @return L'exception mise à jour
      */
+    @Transactional
     public RecurrenceException updateRecurrenceException(Long id, RecurrenceException recurrenceExceptionDetails, Integer userId) {
         LoggerUtils.info(logger, "Updating recurrence exception with id: " + id);
         
         RecurrenceException existingException = recurrenceExceptionRepository.findById(id.intValue())
             .orElseThrow(() -> new RuntimeException("Recurrence exception not found with id: " + id));
         
-        // Vérifier que l'utilisateur est le propriétaire de la série associée
-        if (!existingException.getSeries().getUser().getId().equals(userId)) {
+        // Vérifier que l'utilisateur est le propriétaire d'au moins une des séries associées
+        boolean isAuthorized = existingException.getSeries().stream()
+            .anyMatch(series -> series.getUser().getId().equals(userId));
+            
+        if (!isAuthorized) {
             throw new IllegalArgumentException("You can only update exceptions for your own series.");
         }
         
@@ -91,16 +202,26 @@ public class RecurrenceExceptionService {
      * @param id L'ID de l'exception à supprimer
      * @param userId L'ID de l'utilisateur pour vérification d'autorisation
      */
+    @Transactional
     public void deleteRecurrenceException(Long id, Integer userId) {
         LoggerUtils.info(logger, "Deleting recurrence exception with id: " + id);
         
         RecurrenceException exception = recurrenceExceptionRepository.findById(id.intValue())
             .orElseThrow(() -> new RuntimeException("Recurrence exception not found with id: " + id));
         
-        // Vérifier que l'utilisateur est le propriétaire de la série associée
-        if (!exception.getSeries().getUser().getId().equals(userId)) {
+        // Vérifier que l'utilisateur est le propriétaire d'au moins une des séries associées
+        boolean isAuthorized = exception.getSeries().stream()
+            .anyMatch(series -> series.getUser().getId().equals(userId));
+            
+        if (!isAuthorized) {
             throw new IllegalArgumentException("You can only delete exceptions for your own series.");
         }
+
+        // Supprimer les références dans les séries
+        for (WorktimeSeries series : exception.getSeries()) {
+            series.getExceptions().remove(exception);
+        }
+        workTimeSeriesRepository.saveAll(exception.getSeries());
         
         recurrenceExceptionRepository.delete(exception);
     }
@@ -137,5 +258,16 @@ public class RecurrenceExceptionService {
         }
         
         return series.getExceptions();
+    }
+
+    /**
+     * Récupère toutes les exceptions de récurrence pour un utilisateur
+     * 
+     * @param userId L'ID de l'utilisateur
+     * @return La liste des exceptions liées à l'utilisateur et celles sans séries
+     */
+    public List<RecurrenceException> getAllRecurrenceExceptionsByUserId(Integer userId) {
+        LoggerUtils.info(logger, "Fetching all recurrence exceptions for user: " + userId);
+        return recurrenceExceptionRepository.findAllByUserIdOrWithoutSeries(userId);
     }
 }

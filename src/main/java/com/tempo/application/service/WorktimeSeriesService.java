@@ -3,9 +3,11 @@ package com.tempo.application.service;
 import com.tempo.application.model.worktimeSeries.WorktimeSeries;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.user.User;
+import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.repository.CategoryRepository;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.repository.WorkTimeSeriesRepository;
+import com.tempo.application.repository.RecurrenceExceptionRepository;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import org.springframework.cache.annotation.CacheEvict;
 
@@ -32,6 +35,9 @@ public class WorktimeSeriesService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RecurrenceExceptionRepository recurrenceExceptionRepository;
 
     /**
      * Crée une nouvelle série de créneaux horaires
@@ -75,7 +81,30 @@ public class WorktimeSeriesService {
             throw new IllegalArgumentException("Recurrence rule is required.");
         }
 
-        return repository.save(request);
+        // Si ignoreExceptions est false, chercher les exceptions qui se chevauchent
+        if (!Boolean.TRUE.equals(request.getIgnoreExceptions())) {
+            List<RecurrenceException> overlappingExceptions = recurrenceExceptionRepository.findOverlappingExceptions(
+                request.getStartDate(),
+                request.getEndDate() != null ? request.getEndDate() : LocalDateTime.now().plusYears(100)
+            );
+
+            // Lier les exceptions qui se chevauchent à la série
+            request.setExceptions(new ArrayList<>(overlappingExceptions));
+            
+            // Mettre à jour la relation bidirectionnelle
+            for (RecurrenceException exception : overlappingExceptions) {
+                exception.getSeries().add(request);
+            }
+        }
+
+        WorktimeSeries savedSeries = repository.save(request);
+
+        // Sauvegarder les exceptions mises à jour si nécessaire
+        if (!Boolean.TRUE.equals(request.getIgnoreExceptions()) && !request.getExceptions().isEmpty()) {
+            recurrenceExceptionRepository.saveAll(request.getExceptions());
+        }
+
+        return savedSeries;
     }
     
     /**
@@ -134,10 +163,43 @@ public class WorktimeSeriesService {
         if (request.getEndTime() != null) {
             existingSeries.setEndTime(request.getEndTime());
         }
+
+        // Gestion des exceptions de récurrence
+        if (request.getIgnoreExceptions() != null) {
+            existingSeries.setIgnoreExceptions(request.getIgnoreExceptions());
+            
+            if (Boolean.TRUE.equals(request.getIgnoreExceptions())) {
+                // Si on ignore maintenant les exceptions, on supprime toutes les liaisons
+                for (RecurrenceException exception : existingSeries.getExceptions()) {
+                    exception.getSeries().remove(existingSeries);
+                }
+                existingSeries.getExceptions().clear();
+            } else {
+                // Si on ne les ignore plus, on cherche les exceptions qui se chevauchent
+                List<RecurrenceException> overlappingExceptions = recurrenceExceptionRepository.findOverlappingExceptions(
+                    existingSeries.getStartDate(),
+                    existingSeries.getEndDate() != null ? existingSeries.getEndDate() : LocalDateTime.now().plusYears(100)
+                );
+
+                // Mettre à jour les liaisons
+                existingSeries.getExceptions().clear();
+                existingSeries.getExceptions().addAll(overlappingExceptions);
+                
+                // Mettre à jour la relation bidirectionnelle
+                for (RecurrenceException exception : overlappingExceptions) {
+                    exception.getSeries().add(existingSeries);
+                }
+            }
+        }
         
-        existingSeries.setActive(request.isActive());
-        
-        return repository.save(existingSeries);
+        WorktimeSeries savedSeries = repository.save(existingSeries);
+
+        // Sauvegarder les exceptions mises à jour si nécessaire
+        if (!Boolean.TRUE.equals(savedSeries.getIgnoreExceptions()) && !savedSeries.getExceptions().isEmpty()) {
+            recurrenceExceptionRepository.saveAll(savedSeries.getExceptions());
+        }
+
+        return savedSeries;
     }
     
     /**
@@ -201,7 +263,7 @@ public class WorktimeSeriesService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found."));
         
-        return repository.findByUserAndActiveTrue(user);
+        return repository.findByUser(user);
     }
     
     /**
@@ -216,7 +278,7 @@ public class WorktimeSeriesService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         LocalDateTime targetDate = date.atStartOfDay();
-        List<WorktimeSeries> allActiveSeries = repository.findByUserAndActiveTrue(user);
+        List<WorktimeSeries> allActiveSeries = repository.findByUser(user);
         return allActiveSeries.stream()
             .filter(series -> {
                 boolean afterStart = series.getStartDate().isBefore(targetDate) || series.getStartDate().isEqual(targetDate);
@@ -240,7 +302,7 @@ public class WorktimeSeriesService {
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         LocalDateTime startOfMonth = date.withDayOfMonth(1).atStartOfDay();
         LocalDateTime startOfNextMonth = date.plusMonths(1).withDayOfMonth(1).atStartOfDay();
-        List<WorktimeSeries> allActiveSeries = repository.findByUserAndActiveTrue(user);
+        List<WorktimeSeries> allActiveSeries = repository.findByUser(user);
         return allActiveSeries.stream()
             .filter(series -> {
                 boolean afterStart = series.getStartDate().isBefore(startOfNextMonth) || series.getStartDate().isEqual(startOfNextMonth);

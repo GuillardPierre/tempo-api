@@ -38,6 +38,26 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
            "AND w.startTime >= :from " +
            "AND w.endTime <= :to " +
            "AND w.endTime IS NOT NULL " +
+           "AND NOT EXISTS (" +
+           "    SELECT 1 FROM RecurrenceException e " +
+           "    JOIN e.series s " +
+           "    WHERE s.ignoreExceptions = false " +
+           "    AND w.startTime >= e.pauseStart " +
+           "    AND w.endTime <= e.pauseEnd" +
+           ") " +
+           "GROUP BY w.category.name")
+    List<CategoryStatDTO> getCategoryStatsByUserAndPeriodExcludingExceptions(@Param("userId") Integer userId,
+                                                          @Param("from") LocalDateTime from,
+                                                          @Param("to") LocalDateTime to);
+
+    @Query("SELECT new com.tempo.application.model.worktime.DTO.CategoryStatDTO(" +
+           "w.category.name, " +
+           "CAST(SUM(FUNCTION('TIMESTAMPDIFF', MINUTE, w.startTime, w.endTime)) AS int)) " +
+           "FROM Worktime w " +
+           "WHERE w.user.id = :userId " +
+           "AND w.startTime >= :from " +
+           "AND w.endTime <= :to " +
+           "AND w.endTime IS NOT NULL " +
            "GROUP BY w.category.name")
     List<CategoryStatDTO> getCategoryStatsByUserAndPeriod(@Param("userId") Integer userId,
                                                           @Param("from") LocalDateTime from,
@@ -70,22 +90,6 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
               "GROUP BY period",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByMonth(
-        @Param("userId") Integer userId,
-        @Param("from") LocalDateTime from,
-        @Param("to") LocalDateTime to
-    );
-
-    @Query(
-      value = "SELECT DATE_FORMAT(w.start_time, '%Y') as period, " +
-              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
-              "FROM worktime w " +
-              "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.start_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
-              "GROUP BY period",
-      nativeQuery = true)
-    List<Object[]> getTotalWorktimeByUserAndPeriodGroupByYear(
         @Param("userId") Integer userId,
         @Param("from") LocalDateTime from,
         @Param("to") LocalDateTime to

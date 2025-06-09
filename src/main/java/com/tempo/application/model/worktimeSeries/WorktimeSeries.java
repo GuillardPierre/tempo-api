@@ -2,6 +2,7 @@ package com.tempo.application.model.worktimeSeries;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tempo.application.model.category.Category;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Représente une série récurrente de créneaux.
@@ -49,25 +51,27 @@ public class WorktimeSeries {
 
     private String recurrence;       // RFC5545, ex. "FREQ=WEEKLY;BYDAY=MO,WE,FR"
 
-    @Builder.Default
-    private boolean active = true;
-
-    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "series", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnoreProperties("series")
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
-    private List<RecurrenceException> exceptions;
+    @Builder.Default
+    private List<RecurrenceException> exceptions = new ArrayList<>();
+
+    @Builder.Default
+    private Boolean ignoreExceptions = false;
 
     @Transient
     public Long getDuration() {
         if (startTime == null || endTime == null) {
-            return 0L;
+            return null;
         }
 
         try {
             Duration duration = Duration.between(startTime, endTime);
             return duration.toMinutes();
         } catch (Exception e) {
-            return 0L;
+            return null;
         }
     }
 }

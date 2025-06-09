@@ -2,15 +2,17 @@ package com.tempo.application.model.worktime;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.tempo.application.model.category.Category;
+import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.model.user.User;
 
-import com.tempo.application.model.worktimeSeries.WorktimeSeries;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -34,11 +36,6 @@ public class Worktime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @lombok.ToString.Exclude
-    @lombok.EqualsAndHashCode.Exclude
-    private WorktimeSeries series;   // null si créneau unique
-
     // Format ISO-8601 (2025-04-26T13:30)
     private LocalDateTime startTime;
 
@@ -46,8 +43,6 @@ public class Worktime {
     private LocalDateTime endTime;
 
     private boolean isActive;
-
-    private String recurrencePattern;
 
     @ManyToOne(optional = false)
     @lombok.ToString.Exclude
@@ -76,5 +71,4 @@ public class Worktime {
             return null;
         }
     }
-
 }

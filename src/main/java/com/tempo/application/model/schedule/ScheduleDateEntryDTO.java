@@ -41,7 +41,6 @@ public class ScheduleDateEntryDTO {
                 .type("RECURRING")
                 .startTime(workTimeSeries.getStartTime())
                 .endTime(workTimeSeries.getEndTime())
-                .isActive(workTimeSeries.isActive())
                 .recurrence(workTimeSeries.getRecurrence())
                 .startDate(workTimeSeries.getStartDate())
                 .endDate(workTimeSeries.getEndDate())

@@ -1,51 +1,67 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #   Use this script to test if a given TCP host/port are available
 
 set -e
 
-HOST="$1"
-shift
-PORT="${HOST##*:}"
-HOST="${HOST%%:*}"
+# Fonction pour afficher l'utilisation
+usage() {
+    echo "Usage: $0 host:port [-t timeout] [-- command args]"
+    exit 1
+}
 
-TIMEOUT=60
+# Initialisation des variables
+TIMEOUT=15
 QUIET=0
+HOST=""
+PORT=""
 
-while [[ $# -gt 0 ]]
-do
-    case "$1" in
-        --timeout=*)
-        TIMEOUT="${1#*=}"
-        shift
-        ;;
-        --quiet)
-        QUIET=1
-        shift
-        ;;
-        --)
-        shift
-        break
-        ;;
-        *)
-        break
-        ;;
-    esac
-done
-
-if [[ $QUIET -ne 1 ]]; then
-  echo "Attente de la disponibilité de $HOST:$PORT pendant $TIMEOUT secondes..."
+# Traitement des arguments
+if echo "$1" | grep -q ":"; then
+    HOST=$(echo "$1" | cut -d: -f1)
+    PORT=$(echo "$1" | cut -d: -f2)
+    shift
+else
+    echo "Error: Invalid host:port format"
+    usage
 fi
 
-for ((i=0;i<TIMEOUT;i++)); do
-  if nc -z "$HOST" "$PORT"; then
-    if [[ $QUIET -ne 1 ]]; then
-      echo "$HOST:$PORT est disponible !"
-    fi
-    exec "$@"
-    exit 0
-  fi
-  sleep 1
-done
+# Attente de la disponibilité du service
+wait_for() {
+    echo "Waiting for $HOST:$PORT..."
+    
+    for i in $(seq 1 $TIMEOUT); do
+        if nc -z "$HOST" "$PORT" > /dev/null 2>&1; then
+            if [ $? -eq 0 ]; then
+                echo "$HOST:$PORT is available"
+                return 0
+            fi
+        fi
+        sleep 1
+    done
+    echo "Timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT"
+    return 1
+}
 
-echo "Timeout après $TIMEOUT secondes en attendant $HOST:$PORT"
-exit 1
+# Exécution de la commande
+execute_cmd() {
+    # Supprime le premier argument (--) s'il existe
+    if [ "$1" = "--" ]; then
+        shift
+    fi
+    
+    if [ ! -z "$1" ]; then
+        echo "Executing command: $@"
+        exec "$@"
+    fi
+}
+
+# Programme principal
+wait_for
+RESULT=$?
+if [ $RESULT -eq 0 ]; then
+    # Supprime host:port des arguments et exécute la commande
+    shift
+    execute_cmd "$@"
+else
+    exit $RESULT
+fi

@@ -20,37 +20,66 @@ public class StatsService {
     @Autowired
     private WorkTimeSeriesRepository workTimeSeriesRepository;
 
+    private LocalDateTime calculateRecurrenceEnd(WorktimeSeries series, LocalDateTime requestedEndDate) {
+        return (series.getEndDate() != null && series.getEndDate().isBefore(requestedEndDate)) 
+            ? series.getEndDate() 
+            : requestedEndDate;
+    }
+
     @Cacheable(value = "categoryStats", key = "#userId + ':' + #from + ':' + #to")
     public List<CategoryStatDTO> getCategoryStats(Integer userId, LocalDateTime from, LocalDateTime to) {
-        // 1. Récupérer les worktimes ponctuels
+        // 1. Récupérer tous les worktimes ponctuels (pas besoin de filtrer)
         List<CategoryStatDTO> ponctuels = worktimeRepository.getCategoryStatsByUserAndPeriod(userId, from, to);
         Map<String, Integer> totalDurations = new HashMap<>();
         for (CategoryStatDTO dto : ponctuels) {
             totalDurations.merge(dto.getName(), dto.getDuration(), Integer::sum);
         }
 
-        // 2. Récupérer les séries récurrentes actives
-        List<WorktimeSeries> seriesList = workTimeSeriesRepository.findActiveByUserAndPeriod(userId, from, to);
+        // 2. Récupérer les séries récurrentes
+        List<WorktimeSeries> seriesList = workTimeSeriesRepository.findByUserAndPeriod(userId, from, to);
         for (WorktimeSeries series : seriesList) {
-            // Générer les occurrences dans la période
+            // LocalDateTime recurrenceEnd = calculateRecurrenceEnd(series, to);
+
+            // Si ignoreExceptions est true, on traite la série normalement
+            // Si ignoreExceptions est null, on considère qu'il est false
+            Boolean ignoreExceptions = series.getIgnoreExceptions();
+            if (Boolean.TRUE.equals(ignoreExceptions)) {
+                List<LocalDateTime> occurrences = RecurrenceUtils.generateOccurrences(
+                    series.getRecurrence(),
+                    series.getStartDate(),
+                    from,
+                    to
+                );
+                int totalMinutes = occurrences.size() * series.getDuration().intValue();
+                String catName = series.getCategory().getName();
+                totalDurations.merge(catName, totalMinutes, Integer::sum);
+                continue;
+            }
+
+            // Sinon (ignoreExceptions est false ou null), on filtre les occurrences selon les exceptions
             List<LocalDateTime> occurrences = RecurrenceUtils.generateOccurrences(
                 series.getRecurrence(),
                 series.getStartDate(),
                 from,
                 to
             );
-            // Filtrer les occurrences selon les exceptions
+            
             if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
-                occurrences = occurrences.stream().filter(occ ->
-                    series.getExceptions().stream().noneMatch(ex ->
-                        !occ.isBefore(ex.getPauseStart()) && !occ.isAfter(ex.getPauseEnd())
+                occurrences = occurrences.stream()
+                    .filter(occ -> series.getExceptions().stream()
+                        .noneMatch(ex -> 
+                            (occ.isEqual(ex.getPauseStart()) || occ.isAfter(ex.getPauseStart())) &&
+                            (occ.isEqual(ex.getPauseEnd()) || occ.isBefore(ex.getPauseEnd()))
+                        )
                     )
-                ).collect(Collectors.toList());
+                    .collect(Collectors.toList());
             }
+            
             int totalMinutes = occurrences.size() * series.getDuration().intValue();
             String catName = series.getCategory().getName();
             totalDurations.merge(catName, totalMinutes, Integer::sum);
         }
+
         // 3. Retourner la liste finale
         return totalDurations.entrySet().stream()
             .map(e -> new CategoryStatDTO(e.getKey(), e.getValue()))
@@ -91,27 +120,49 @@ public class StatsService {
         }
 
         // Séries récurrentes
-        List<com.tempo.application.model.worktimeSeries.WorktimeSeries> seriesList = workTimeSeriesRepository.findActiveByUserAndPeriod(userId, from, to);
-        for (com.tempo.application.model.worktimeSeries.WorktimeSeries series : seriesList) {
-            java.time.LocalDateTime recurrenceEnd = (series.getEndDate() != null && series.getEndDate().isBefore(to)) ? series.getEndDate() : to;
-            List<java.time.LocalDateTime> occurrences = com.tempo.application.utils.RecurrenceUtils.generateOccurrences(
+        List<WorktimeSeries> seriesList = workTimeSeriesRepository.findByUserAndPeriod(userId, from, to);
+        for (WorktimeSeries series : seriesList) {
+            LocalDateTime recurrenceEnd = calculateRecurrenceEnd(series, to);
+
+            // Si ignoreExceptions est true, on traite la série normalement
+            // Si ignoreExceptions est null, on considère qu'il est false
+            Boolean ignoreExceptions = series.getIgnoreExceptions();
+            if (Boolean.TRUE.equals(ignoreExceptions)) {
+                List<LocalDateTime> occurrences = RecurrenceUtils.generateOccurrences(
+                    series.getRecurrence(),
+                    series.getStartDate(),
+                    from,
+                    recurrenceEnd
+                );
+                for (LocalDateTime occ : occurrences) {
+                    String period = formatPeriod(occ, type);
+                    int duration = series.getDuration().intValue();
+                    totalByPeriod.merge(period, duration, Integer::sum);
+                }
+                continue;
+            }
+
+            // Sinon (ignoreExceptions est false ou null), on filtre les occurrences selon les exceptions
+            List<LocalDateTime> occurrences = RecurrenceUtils.generateOccurrences(
                 series.getRecurrence(),
                 series.getStartDate(),
                 from,
                 recurrenceEnd
             );
-            for (java.time.LocalDateTime occ : occurrences) {
-                String period;
-                if ("month".equalsIgnoreCase(type)) {
-                    java.time.temporal.WeekFields weekFields = java.time.temporal.WeekFields.ISO;
-                    int weekNumber = occ.get(weekFields.weekOfWeekBasedYear());
-                    int year = occ.getYear();
-                    period = year + "-S" + String.format("%02d", weekNumber);
-                } else if ("year".equalsIgnoreCase(type)) {
-                    period = String.format("%d-%02d", occ.getYear(), occ.getMonthValue());
-                } else {
-                    period = occ.toLocalDate().toString();
-                }
+
+            if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
+                occurrences = occurrences.stream()
+                    .filter(occ -> series.getExceptions().stream()
+                        .noneMatch(ex -> 
+                            (occ.isEqual(ex.getPauseStart()) || occ.isAfter(ex.getPauseStart())) &&
+                            (occ.isEqual(ex.getPauseEnd()) || occ.isBefore(ex.getPauseEnd()))
+                        )
+                    )
+                    .collect(Collectors.toList());
+            }
+
+            for (LocalDateTime occ : occurrences) {
+                String period = formatPeriod(occ, type);
                 int duration = series.getDuration().intValue();
                 totalByPeriod.merge(period, duration, Integer::sum);
             }
@@ -173,5 +224,18 @@ public class StatsService {
         result.put("labels", labels);
         result.put("data", data);
         return result;
+    }
+
+    private String formatPeriod(LocalDateTime date, String type) {
+        if ("month".equalsIgnoreCase(type)) {
+            java.time.temporal.WeekFields weekFields = java.time.temporal.WeekFields.ISO;
+            int weekNumber = date.get(weekFields.weekOfWeekBasedYear());
+            int year = date.getYear();
+            return year + "-S" + String.format("%02d", weekNumber);
+        } else if ("year".equalsIgnoreCase(type)) {
+            return String.format("%d-%02d", date.getYear(), date.getMonthValue());
+        } else {
+            return date.toLocalDate().toString();
+        }
     }
 } 
