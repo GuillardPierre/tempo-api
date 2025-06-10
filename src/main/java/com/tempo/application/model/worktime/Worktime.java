@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tempo.application.model.category.Category;
 import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.model.user.User;
@@ -31,6 +32,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Worktime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,12 +49,14 @@ public class Worktime {
     @ManyToOne(optional = false)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties({"worktimes", "password"})
     private User user;
 
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties("worktimes")
     private Category category;
 
     @Builder.Default

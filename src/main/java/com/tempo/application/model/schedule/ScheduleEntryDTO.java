@@ -16,18 +16,17 @@ import java.time.LocalDateTime;
 public class ScheduleEntryDTO {
     private Long id;
     private String type;
-    private Long seriesId; 
-    private LocalDateTime startTime; // heure de début
+    private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private LocalDateTime startDate; // Date de début pour les séries
-    private LocalDateTime endDate;
-    
+    private LocalDateTime startDate;
+    private LocalDateTime endDate; 
     private Long duration;
     private String recurrence;
-    private boolean isActive;
     private Long categoryId;
     private String categoryName;
     private String categoryColor;
+    private Boolean ignoreExceptions;
+
 
     // Factory method pour créer à partir d'un Worktime
     public static ScheduleEntryDTO fromWorktime(Worktime worktime) {
@@ -40,7 +39,6 @@ public class ScheduleEntryDTO {
                 .startTime(worktime.getStartTime())
                 .endTime(worktime.getEndTime())
                 .duration(worktime.getDuration())
-                .isActive(worktime.isActive())
                 .categoryId((long) worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
                 .build();
@@ -59,6 +57,7 @@ public class ScheduleEntryDTO {
                 .duration(workTimeSeries.getDuration())
                 .categoryId((long) workTimeSeries.getCategory().getId())
                 .categoryName(workTimeSeries.getCategory().getName())
+                .ignoreExceptions(workTimeSeries.getIgnoreExceptions())
                 .build();
     }
 
@@ -67,7 +66,6 @@ public class ScheduleEntryDTO {
                 .id((long) worktime.getId())
                 .type("CHRONO")
                 .startTime(worktime.getStartTime())
-                .isActive(worktime.isActive())
                 .categoryId((long) worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
                 .build();

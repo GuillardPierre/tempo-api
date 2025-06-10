@@ -107,14 +107,21 @@ public class RecurrenceExceptionController {
             
             RecurrenceException exception = recurrenceExceptionService.getRecurrenceExceptionById(id);
             
-            // Vérifier que l'utilisateur est autorisé à voir cette exception
-            boolean isAuthorized = exception.getSeries().stream()
-                .anyMatch(series -> series.getUser() != null && series.getUser().getId().equals(user.getId()));
+            if (exception == null) {
+                ApiError error = new ApiError(HttpStatus.NOT_FOUND, "Recurrence exception not found", "EXCEPTION_NOT_FOUND");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+            
+            boolean isAuthorized = exception.getSeries() != null && 
+                exception.getSeries().stream()
+                    .anyMatch(series -> series.getUser() != null && series.getUser().getId().equals(user.getId()));
+                    
             if (!isAuthorized) {
                 ApiError error = new ApiError(HttpStatus.FORBIDDEN, "Access denied", "ACCESS_DENIED");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
             }
             
+            // Utiliser le DTO pour éviter les références circulaires
             RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(exception);
             return ResponseEntity.ok(responseDto);
         } catch (Exception e) {

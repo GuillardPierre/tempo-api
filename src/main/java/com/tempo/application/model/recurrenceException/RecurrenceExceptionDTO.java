@@ -16,9 +16,16 @@ public class RecurrenceExceptionDTO {
         dto.setId(entity.getId());
         dto.setPauseStart(entity.getPauseStart());
         dto.setPauseEnd(entity.getPauseEnd());
-        dto.setSeriesIds(entity.getSeries().stream()
-            .map(series -> series.getId())
-            .toList());
+        
+        // Gérer le cas où series est null
+        if (entity.getSeries() != null) {
+            dto.setSeriesIds(entity.getSeries().stream()
+                .filter(series -> series != null)
+                .map(series -> series.getId())
+                .toList());
+        } else {
+            dto.setSeriesIds(List.of());
+        }
         return dto;
     }
 } 

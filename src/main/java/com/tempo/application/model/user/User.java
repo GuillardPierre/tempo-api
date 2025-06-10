@@ -2,8 +2,7 @@ package com.tempo.application.model.user;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.tempo.application.model.category.Category;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tempo.application.model.worktime.Worktime;
 
 import jakarta.persistence.CascadeType;
@@ -23,6 +22,7 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"worktimes", "hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,5 +37,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties("user")
     private List<Worktime> worktimes;
 }
