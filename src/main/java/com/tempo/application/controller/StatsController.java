@@ -39,4 +39,4 @@ public class StatsController {
         result.put("total", total);
         return result;
     }
-} 
+}  

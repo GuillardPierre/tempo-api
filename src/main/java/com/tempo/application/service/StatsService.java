@@ -199,7 +199,7 @@ public class StatsService {
                 String period = year + "-S" + String.format("%02d", weekNumber);
                 if (!seen.contains(period)) {
                     periods.add(period);
-                    labels.add("Semaine " + weekNumber);
+                    labels.add(String.format("%02d/%02d", d.getDayOfMonth(), d.getMonthValue()));
                     data.add(totalByPeriod.getOrDefault(period, 0));
                     seen.add(period);
                 }
