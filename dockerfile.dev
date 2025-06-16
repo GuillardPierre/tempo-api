@@ -1,0 +1,21 @@
+FROM maven:3.9.6-eclipse-temurin-21
+WORKDIR /app
+
+# Installation de netcat pour wait-for-it
+RUN apt-get update && apt-get install -y netcat-openbsd
+
+# Copier le pom.xml et télécharger les dépendances (cache Docker)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copier le script wait-for-it
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Variables d'environnement pour Spring Boot DevTools
+ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
+ENV SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+# Commande pour démarrer l'application en mode développement (compatible PostgreSQL)
+ENTRYPOINT ["/wait-for-it.sh", "postgres:5432", "--", "mvn", "spring-boot:run"] 

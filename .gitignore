@@ -34,3 +34,6 @@ build/
 
 logs/
 .env
+
+TODO.md
+DEPLOY.md

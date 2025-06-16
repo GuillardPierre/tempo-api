@@ -1,0 +1,56 @@
+# Dockerfile optimisé pour production
+# Multi-stage build pour minimiser la taille de l'image finale
+
+# Étape 1 : Build de l'application
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+WORKDIR /app
+
+# Copier les fichiers de configuration Maven d'abord (cache Docker)
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+RUN chmod +x ./mvnw
+
+# Télécharger les dépendances (couche mise en cache)
+RUN ./mvnw dependency:go-offline -B
+
+# Copier le code source et compiler
+COPY src ./src
+RUN ./mvnw clean package -DskipTests -B
+
+# Étape 2 : Image de production finale
+FROM eclipse-temurin:21-jre-alpine
+
+# Créer un utilisateur non-root pour la sécurité
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# Installation des outils nécessaires
+RUN apk --no-cache add curl netcat-openbsd
+
+WORKDIR /app
+
+# Copier les fichiers nécessaires depuis l'étape de build
+COPY --from=build /app/target/application-*.jar app.jar
+COPY wait-for-it.sh /wait-for-it.sh
+
+# Donner les permissions appropriées
+RUN chmod +x /wait-for-it.sh && \
+    chown -R appuser:appgroup /app
+
+# Passer à l'utilisateur non-root
+USER appuser
+
+# Variables d'environnement pour la production
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+
+# Health check pour Docker/Kubernetes
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# Exposer le port
+EXPOSE 8080
+
+# Commande de lancement (compatible MySQL et PostgreSQL)
+ENTRYPOINT ["/wait-for-it.sh", "postgres:5432", "--", "java", "$JAVA_OPTS", "-jar", "/app/app.jar"] 
