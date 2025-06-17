@@ -120,10 +120,41 @@ src/
 
 ## 🔄 Scripts disponibles
 
-| Script         | Usage         | Description            |
-| -------------- | ------------- | ---------------------- |
-| `dev-start.sh` | Développement | Lance avec hot reload  |
-| `start.sh`     | Production    | Lance en mode optimisé |
+| Script                    | Usage          | Description                        |
+| ------------------------- | -------------- | ---------------------------------- |
+| `dev-start.sh`            | Développement  | Lance avec hot reload              |
+| `dev-start-postgresql.sh` | Développement  | Lance avec PostgreSQL + hot reload |
+| `start.sh`                | Production     | Lance en mode optimisé             |
+| `generate-migration.sh`   | Génération DDL | Crée migrations depuis entités     |
+
+## 🗂️ Génération DDL
+
+Générez automatiquement les migrations de base de données depuis vos entités JPA :
+
+### 🚀 Génération rapide
+
+```bash
+# Générer une migration depuis les entités
+./generate-migration.sh
+```
+
+### 🛠️ Génération manuelle
+
+```bash
+# Avec Maven
+./mvnw spring-boot:run -Dspring.profiles.active=ddl-export
+
+# Résultat dans :
+# - target/generated-schema.sql (script SQL)
+# - src/main/resources/db/migration/ (migration Flyway)
+```
+
+### 📋 Quand utiliser
+
+- ✅ Après modification d'entités JPA (`@Entity`)
+- ✅ Ajout de nouvelles tables
+- ✅ Changement de structure de données
+- ❌ **Pas en développement normal** (déjà désactivé)
 
 ## 🛑 Arrêt des services
 

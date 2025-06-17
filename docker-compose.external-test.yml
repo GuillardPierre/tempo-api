@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  tempo-api:
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    ports:
+      - '8080:8080'
+    environment:
+      # Connecter à une base PostgreSQL externe
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5433/tempo_db
+      - DB_USERNAME=tempo_user
+      - DB_PASSWORD=tempo_pass
+      - SPRING_PROFILES_ACTIVE=external-db
+    networks:
+      - tempo-network
+    # Attend que la base externe soit accessible
+    depends_on:
+      - db-check
+    restart: unless-stopped
+
+  # Service pour vérifier la connectivité BDD
+  db-check:
+    image: postgres:15
+    command: >
+      sh -c "
+        until pg_isready -h host.docker.internal -p 5433 -U tempo_user; do
+          echo 'En attente de la base de données externe...'
+          sleep 2
+        done
+        echo 'Base de données externe accessible !'
+      "
+    networks:
+      - tempo-network
+
+networks:
+  tempo-network:
+    driver: bridge
+# Usage:
+# 1. Démarrer PostgreSQL en local sur le port 5433
+# 2. docker-compose -f docker-compose.external-test.yml up

@@ -18,4 +18,4 @@ ENV SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 # Commande pour démarrer l'application en mode développement (compatible PostgreSQL)
-ENTRYPOINT ["/wait-for-it.sh", "postgres:5432", "--", "mvn", "spring-boot:run"] 
+ENTRYPOINT ["/wait-for-it.sh", "postgres:5432", "--", "mvn", "spring-boot:run", "-Dspring-boot.run.main-class=com.tempo.application.TempoApiApplication"] 

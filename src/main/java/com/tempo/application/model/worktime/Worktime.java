@@ -52,8 +52,8 @@ public class Worktime {
     @JsonIgnoreProperties({"worktimes", "password"})
     private User user;
 
-    @ManyToOne(optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(optional = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     @JsonIgnoreProperties("worktimes")

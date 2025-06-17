@@ -165,6 +165,53 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			
+			<!-- Configuration du compilateur Maven avec Lombok -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<source>21</source>
+					<target>21</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.36</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			
+			<!-- Plugin Flyway pour la gestion des migrations -->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>10.6.0</version>
+				<configuration>
+					<url>${DATABASE_URL:jdbc:postgresql://localhost:5432/tempo_db}</url>
+					<user>${DB_USERNAME:tempo_user}</user>
+					<password>${DB_PASSWORD:tempo_pass}</password>
+					<schemas>
+						<schema>public</schema>
+					</schemas>
+					<locations>
+						<location>classpath:db/migration</location>
+					</locations>
+					<baselineOnMigrate>true</baselineOnMigrate>
+					<cleanDisabled>false</cleanDisabled>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>42.7.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			
+
 		</plugins>
 	</build>
 

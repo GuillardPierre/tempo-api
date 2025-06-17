@@ -10,24 +10,11 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Initialisation optionnelle
-      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U tempo_user -d tempo_db']
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
-
-  flyway:
-    image: flyway/flyway:latest
-    command: -url=jdbc:postgresql://postgres:5432/tempo_db -user=tempo_user -password=tempo_pass -connectRetries=60 -baselineOnMigrate=true -locations=filesystem:/flyway/sql migrate
-    volumes:
-      - ./src/main/resources/db/migration/postgresql:/flyway/sql
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - app-network
 
@@ -40,9 +27,10 @@ services:
       - DB_USERNAME=tempo_user
       - DB_PASSWORD=tempo_pass
       - APP_SECRET_KEY=secretazertyuiopqsdfghjklmwxcvbnazertyuiopqsdfghjklmwxcvbn
+      - APP_JWT_EXPIRATION=86400000
       - JAVA_OPTS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=postgresql
-      - SPRING_FLYWAY_ENABLED=false
+      - SPRING_FLYWAY_ENABLED=true
       # Configuration DevTools
       - SPRING_DEVTOOLS_RESTART_ENABLED=true
       - SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
@@ -58,8 +46,8 @@ services:
       # Cache Maven pour éviter de retélécharger les dépendances
       - maven-cache:/root/.m2
     depends_on:
-      flyway:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
 
