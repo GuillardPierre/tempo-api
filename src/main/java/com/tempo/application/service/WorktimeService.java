@@ -65,12 +65,6 @@ public class WorktimeService {
         worktime.setEndTime(worktimeRequest.getEndTime());
         worktime.setCategory(category);
         worktime.setUser(user);
-        // Gestion du compteur en cours : si endTime est null, active = true
-        if (worktimeRequest.getEndTime() == null) {
-            worktime.setActive(true);
-        } else {
-            worktime.setActive(false);
-        }
         return worktimeRepository.save(worktime);
     }
 
@@ -163,7 +157,17 @@ public class WorktimeService {
         return worktimeRepository.findByStartTimeBetweenAndUser(startOfMonth, endOfMonth, user);
     }
 
-    public List<Worktime> findByUserIdAndActiveTrueAndEndTimeIsNull(LocalDate date, Integer userId) {
-        return worktimeRepository.findByUserIdAndActiveTrueAndEndTimeIsNull(userId);
+    /**
+     * Récupère tous les worktimes en cours (sans endTime) pour un utilisateur
+     * Remplace l'ancienne méthode findByUserIdAndActiveTrueAndEndTimeIsNull
+     * 
+     * @param userId L'ID de l'utilisateur
+     * @return La liste des worktimes en cours pour cet utilisateur
+     */
+    public List<Worktime> getOngoingWorktimesByUserId(Integer userId) {
+        LoggerUtils.info(logger, "Fetching ongoing worktimes (endTime is null) for user id: " + userId);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        return worktimeRepository.findByUserAndEndTimeIsNull(user);
     }
 }

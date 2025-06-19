@@ -173,8 +173,6 @@ public class DDLGenerator {
                     id SERIAL PRIMARY KEY,
                     start_time TIMESTAMP NOT NULL,
                     end_time TIMESTAMP,
-                    is_active BOOLEAN NOT NULL DEFAULT false,
-                    active BOOLEAN NOT NULL DEFAULT true,
                     user_id INTEGER NOT NULL,
                     category_id INTEGER NOT NULL,
                     CONSTRAINT fk_worktime_user FOREIGN KEY (user_id) REFERENCES public."user"(id),

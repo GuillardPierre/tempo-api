@@ -29,10 +29,12 @@ public class StatsService {
     @Cacheable(value = "categoryStats", key = "#userId + ':' + #from + ':' + #to")
     public List<CategoryStatDTO> getCategoryStats(Integer userId, LocalDateTime from, LocalDateTime to) {
         // 1. Récupérer tous les worktimes ponctuels (pas besoin de filtrer)
-        List<CategoryStatDTO> ponctuels = worktimeRepository.getCategoryStatsByUserAndPeriod(userId, from, to);
+        List<Object[]> ponctuelsRaw = worktimeRepository.getCategoryStatsByUserAndPeriod(userId, from, to);
         Map<String, Integer> totalDurations = new HashMap<>();
-        for (CategoryStatDTO dto : ponctuels) {
-            totalDurations.merge(dto.getName(), dto.getDuration(), Integer::sum);
+        for (Object[] row : ponctuelsRaw) {
+            String categoryName = (String) row[0];
+            Integer duration = (Integer) row[1];
+            totalDurations.merge(categoryName, duration, Integer::sum);
         }
 
         // 2. Récupérer les séries récurrentes

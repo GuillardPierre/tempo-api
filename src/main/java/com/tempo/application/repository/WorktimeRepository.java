@@ -25,47 +25,52 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     // Retourne tous les worktimes pour une plage de dates et un utilisateur spécifique
     List<Worktime> findByStartTimeBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
 
-    // Retourne tous les worktimes actifs pour un utilisateur
-    List<Worktime> findByUserIdAndActiveTrueAndEndTimeIsNull(Integer userId);
+    // Récupère tous les worktimes en cours (sans endTime) pour un utilisateur
+    List<Worktime> findByUserAndEndTimeIsNull(User user);
 
     void deleteByCategory(Category category);
 
-    @Query("SELECT new com.tempo.application.model.worktime.DTO.CategoryStatDTO(" +
-           "w.category.name, " +
-           "CAST(SUM(FUNCTION('TIMESTAMPDIFF', MINUTE, w.startTime, w.endTime)) AS int)) " +
-           "FROM Worktime w " +
-           "WHERE w.user.id = :userId " +
-           "AND w.startTime >= :from " +
-           "AND w.endTime <= :to " +
-           "AND w.endTime IS NOT NULL " +
-           "AND NOT EXISTS (" +
-           "    SELECT 1 FROM RecurrenceException e " +
-           "    JOIN e.series s " +
-           "    WHERE s.ignoreExceptions = false " +
-           "    AND w.startTime >= e.pauseStart " +
-           "    AND w.endTime <= e.pauseEnd" +
-           ") " +
-           "GROUP BY w.category.name")
-    List<CategoryStatDTO> getCategoryStatsByUserAndPeriodExcludingExceptions(@Param("userId") Integer userId,
+    @Query(
+      value = "SELECT c.name as name, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS INTEGER) as duration " +
+              "FROM worktime w " +
+              "JOIN category c ON w.category_id = c.id " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.end_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "AND NOT EXISTS (" +
+              "    SELECT 1 FROM recurrence_exception_series res " +
+              "    JOIN recurrence_exception e ON res.exception_id = e.id " +
+              "    JOIN worktime_series s ON res.series_id = s.id " +
+              "    WHERE s.ignore_exceptions = false " +
+              "    AND w.start_time >= e.pause_start " +
+              "    AND w.end_time <= e.pause_end" +
+              ") " +
+              "GROUP BY c.name",
+      nativeQuery = true)
+    List<Object[]> getCategoryStatsByUserAndPeriodExcludingExceptions(@Param("userId") Integer userId,
                                                           @Param("from") LocalDateTime from,
                                                           @Param("to") LocalDateTime to);
 
-    @Query("SELECT new com.tempo.application.model.worktime.DTO.CategoryStatDTO(" +
-           "w.category.name, " +
-           "CAST(SUM(FUNCTION('TIMESTAMPDIFF', MINUTE, w.startTime, w.endTime)) AS int)) " +
-           "FROM Worktime w " +
-           "WHERE w.user.id = :userId " +
-           "AND w.startTime >= :from " +
-           "AND w.endTime <= :to " +
-           "AND w.endTime IS NOT NULL " +
-           "GROUP BY w.category.name")
-    List<CategoryStatDTO> getCategoryStatsByUserAndPeriod(@Param("userId") Integer userId,
+    @Query(
+      value = "SELECT c.name as name, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS INTEGER) as duration " +
+              "FROM worktime w " +
+              "JOIN category c ON w.category_id = c.id " +
+              "WHERE w.user_id = :userId " +
+              "AND w.start_time >= :from " +
+              "AND w.end_time <= :to " +
+              "AND w.end_time IS NOT NULL " +
+              "GROUP BY c.name",
+      nativeQuery = true)
+    List<Object[]> getCategoryStatsByUserAndPeriod(@Param("userId") Integer userId,
                                                           @Param("from") LocalDateTime from,
                                                           @Param("to") LocalDateTime to);
 
     @Query(
       value = "SELECT DATE(w.start_time) as date, " +
-              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
               "AND w.start_time >= :from " +
@@ -80,14 +85,14 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     );
 
     @Query(
-      value = "SELECT DATE_FORMAT(w.start_time, '%Y-%m') as period, " +
-              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+      value = "SELECT TO_CHAR(w.start_time, 'YYYY-MM') as period, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
               "AND w.start_time >= :from " +
               "AND w.start_time <= :to " +
               "AND w.end_time IS NOT NULL " +
-              "GROUP BY period",
+              "GROUP BY TO_CHAR(w.start_time, 'YYYY-MM')",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByMonth(
         @Param("userId") Integer userId,
@@ -96,14 +101,14 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     );
 
     @Query(
-      value = "SELECT YEAR(w.start_time) as y, WEEK(w.start_time, 1) as w, " +
-              "CAST(SUM(TIMESTAMPDIFF(MINUTE, w.start_time, w.end_time)) AS SIGNED) as duration " +
+      value = "SELECT EXTRACT(YEAR FROM w.start_time) as y, EXTRACT(WEEK FROM w.start_time) as w, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
               "AND w.start_time >= :from " +
               "AND w.start_time <= :to " +
               "AND w.end_time IS NOT NULL " +
-              "GROUP BY y, w",
+              "GROUP BY EXTRACT(YEAR FROM w.start_time), EXTRACT(WEEK FROM w.start_time)",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByWeek(
         @Param("userId") Integer userId,

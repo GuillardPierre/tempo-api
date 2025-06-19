@@ -30,9 +30,7 @@ public class ScheduleEntryDTO {
 
     // Factory method pour créer à partir d'un Worktime
     public static ScheduleEntryDTO fromWorktime(Worktime worktime) {
-        if (worktime.isActive() && worktime.getEndTime() == null) {
-            return null;
-        }
+        // Vérification isActive() supprimée - fonctionnalité retirée
         return ScheduleEntryDTO.builder()
                 .id((long) worktime.getId())
                 .type("SINGLE")
@@ -61,15 +59,6 @@ public class ScheduleEntryDTO {
                 .build();
     }
 
-    public static ScheduleEntryDTO fromActiveWorktime(Worktime worktime) {
-        return ScheduleEntryDTO.builder()
-                .id((long) worktime.getId())
-                .type("CHRONO")
-                .startTime(worktime.getStartTime())
-                .categoryId((long) worktime.getCategory().getId())
-                .categoryName(worktime.getCategory().getName())
-                .build();
-    }
     
     // Alias pour assurer la compatibilité avec l'appel existant dans ScheduleService
     public static ScheduleEntryDTO fromWorktimeSeries(WorktimeSeries workTimeSeries) {

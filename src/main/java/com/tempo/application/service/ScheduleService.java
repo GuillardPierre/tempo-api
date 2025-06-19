@@ -56,12 +56,18 @@ public class ScheduleService {
                 .collect(Collectors.toList());
         schedule.addAll(workTimeSeriesDTOs);
 
-        // Récupérer les Worktime actifs pour TOUTE les dates
-        List<Worktime> activeWorktimes = worktimeService.findByUserIdAndActiveTrueAndEndTimeIsNull(date, userId);
-        List<ScheduleEntryDTO> activeWorktimeDTOs = activeWorktimes.stream()
-                .map(ScheduleEntryDTO::fromActiveWorktime)
+        // Récupérer les Worktime en cours (sans endTime) - considérés comme des chronos actifs
+        List<Worktime> ongoingWorktimes = worktimeService.getOngoingWorktimesByUserId(userId);
+        List<ScheduleEntryDTO> ongoingWorktimeDTOs = ongoingWorktimes.stream()
+                .map(worktime -> ScheduleEntryDTO.builder()
+                        .id((long) worktime.getId())
+                        .type("CHRONO")
+                        .startTime(worktime.getStartTime())
+                        .categoryId((long) worktime.getCategory().getId())
+                        .categoryName(worktime.getCategory().getName())
+                        .build())
                 .collect(Collectors.toList());
-        schedule.addAll(activeWorktimeDTOs);
+        schedule.addAll(ongoingWorktimeDTOs);
 
         return schedule.stream()
             .sorted(Comparator.comparing(

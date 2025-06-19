@@ -17,11 +17,9 @@ public class WorktimeResponseDTO {
     private String type; // "SINGLE"
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private boolean isActive;
     private Integer categoryId;
     private String categoryName;
     private Long duration;
-
 
     public static WorktimeResponseDTO fromEntity(Worktime worktime) {
         return WorktimeResponseDTO.builder()
@@ -29,7 +27,6 @@ public class WorktimeResponseDTO {
                 .type("SINGLE")
                 .startTime(worktime.getStartTime())
                 .endTime(worktime.getEndTime())
-                .isActive(worktime.isActive())
                 .categoryId(worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
                 .duration(worktime.getDuration())

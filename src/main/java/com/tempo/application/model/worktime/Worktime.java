@@ -44,8 +44,6 @@ public class Worktime {
     // Format ISO-8601 (2025-04-26T13:30)
     private LocalDateTime endTime;
 
-    private boolean isActive;
-
     @ManyToOne(optional = false)
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
@@ -58,9 +56,6 @@ public class Worktime {
     @lombok.EqualsAndHashCode.Exclude
     @JsonIgnoreProperties("worktimes")
     private Category category;
-
-    @Builder.Default
-    private boolean active = true;
 
     @Transient
     public Long getDuration() {

@@ -19,7 +19,6 @@ public class ScheduleDateEntryDTO {
     private String type; // "SINGLE" ou "RECURRING"
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Boolean isActive;
     private String recurrence;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -31,7 +30,6 @@ public class ScheduleDateEntryDTO {
                 .type("SINGLE")
                 .startTime(worktime.getStartTime())
                 .endTime(worktime.getEndTime())
-                .isActive(worktime.isActive())
                 .build();
     }
 

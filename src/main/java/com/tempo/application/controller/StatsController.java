@@ -32,6 +32,9 @@ public class StatsController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
         List<CategoryStatDTO> categories = statsService.getCategoryStats(user.getId(), from, to);
         Object total = statsService.getTotalWorkTime(user.getId(), from, to, type);
         java.util.Map<String, Object> result = new java.util.HashMap<>();
