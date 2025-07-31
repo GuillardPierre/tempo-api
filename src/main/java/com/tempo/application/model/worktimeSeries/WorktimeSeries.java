@@ -44,10 +44,10 @@ public class WorktimeSeries {
     private LocalDateTime endDate;    // nullable = récursif jusqu'à annulation
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime startTime;  
+    private LocalDateTime startHour;  
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime endTime;  
+    private LocalDateTime endHour;  
 
     private String recurrence;       // RFC5545, ex. "FREQ=WEEKLY;BYDAY=MO,WE,FR"
 
@@ -63,12 +63,12 @@ public class WorktimeSeries {
 
     @Transient
     public Long getDuration() {
-        if (startTime == null || endTime == null) {
+        if (startHour == null || endHour == null) {
             return null;
         }
 
         try {
-            Duration duration = Duration.between(startTime, endTime);
+            Duration duration = Duration.between(startHour, endHour);
             return duration.toMinutes();
         } catch (Exception e) {
             return null;

@@ -57,16 +57,16 @@ public class WorktimeSeriesController {
             }
             
             // Vérifier que les heures de début et de fin sont présentes
-            if (worktimeSeriesRequest.getStartTime() == null) {
+            if (worktimeSeriesRequest.getStartHour() == null) {
                 return ResponseEntity.badRequest().body("Start time is required");
             }
             
-            if (worktimeSeriesRequest.getEndTime() == null) {
+            if (worktimeSeriesRequest.getEndHour() == null) {
                 return ResponseEntity.badRequest().body("End time is required");
             }
             
             // Vérifier que l'heure de début est avant l'heure de fin
-            if (worktimeSeriesRequest.getStartTime().isAfter(worktimeSeriesRequest.getEndTime())) {
+            if (worktimeSeriesRequest.getStartHour().isAfter(worktimeSeriesRequest.getEndHour())) {
                 return ResponseEntity.badRequest().body("Start time must be before end time");
             }
             

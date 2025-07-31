@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 public class ScheduleDateEntryDTO {
     private Long id;
     private String type; // "SINGLE" ou "RECURRING"
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startHour;
+    private LocalDateTime endHour;
     private String recurrence;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -28,8 +28,8 @@ public class ScheduleDateEntryDTO {
         return ScheduleDateEntryDTO.builder()
                 .id((long) worktime.getId())
                 .type("SINGLE")
-                .startTime(worktime.getStartTime())
-                .endTime(worktime.getEndTime())
+                .startHour(worktime.getStartHour())
+                .endHour(worktime.getEndHour())
                 .build();
     }
 
@@ -37,8 +37,8 @@ public class ScheduleDateEntryDTO {
         return ScheduleDateEntryDTO.builder()
                 .id(workTimeSeries.getId())
                 .type("RECURRING")
-                .startTime(workTimeSeries.getStartTime())
-                .endTime(workTimeSeries.getEndTime())
+                .startHour(workTimeSeries.getStartHour())
+                .endHour(workTimeSeries.getEndHour())
                 .recurrence(workTimeSeries.getRecurrence())
                 .startDate(workTimeSeries.getStartDate())
                 .endDate(workTimeSeries.getEndDate())

@@ -61,8 +61,8 @@ public class WorktimeService {
         }
         
         Worktime worktime = new Worktime();
-        worktime.setStartTime(worktimeRequest.getStartTime());
-        worktime.setEndTime(worktimeRequest.getEndTime());
+        worktime.setStartHour(worktimeRequest.getStartHour());
+        worktime.setEndHour(worktimeRequest.getEndHour());
         worktime.setCategory(category);
         worktime.setUser(user);
         return worktimeRepository.save(worktime);
@@ -104,8 +104,8 @@ public class WorktimeService {
                     .orElseThrow(() -> new RuntimeException("Category not found or does not belong to this user"));
             }
                 
-            worktime.setStartTime(worktimeUpdateRequest.getStartTime());
-            worktime.setEndTime(worktimeUpdateRequest.getEndTime());
+            worktime.setStartHour(worktimeUpdateRequest.getStartHour());
+            worktime.setEndHour(worktimeUpdateRequest.getEndHour());
             worktime.setCategory(category);
             return worktimeRepository.save(worktime);
         } else {
@@ -129,7 +129,7 @@ public class WorktimeService {
     public List<Worktime> getAllUserWorktimesByDate(LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
-        return worktimeRepository.findByStartTimeBetween(startOfDay, endOfDay);
+        return worktimeRepository.findByStartHourBetween(startOfDay, endOfDay);
     }
     
     /**
@@ -145,7 +145,7 @@ public class WorktimeService {
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return worktimeRepository.findByStartTimeBetweenAndUser(startOfDay, endOfDay, user);
+        return worktimeRepository.findByStartHourBetweenAndUser(startOfDay, endOfDay, user);
     }
 
     public List<Worktime> getAllUserWorktimesByMonthAndUserId(LocalDate date, Integer userId) {
@@ -154,7 +154,7 @@ public class WorktimeService {
         LocalDateTime endOfMonth = date.plusMonths(1).withDayOfMonth(1).atStartOfDay();
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return worktimeRepository.findByStartTimeBetweenAndUser(startOfMonth, endOfMonth, user);
+        return worktimeRepository.findByStartHourBetweenAndUser(startOfMonth, endOfMonth, user);
     }
 
     /**
@@ -168,6 +168,6 @@ public class WorktimeService {
         LoggerUtils.info(logger, "Fetching ongoing worktimes (endTime is null) for user id: " + userId);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return worktimeRepository.findByUserAndEndTimeIsNull(user);
+        return worktimeRepository.findByUserAndEndHourIsNull(user);
     }
 }

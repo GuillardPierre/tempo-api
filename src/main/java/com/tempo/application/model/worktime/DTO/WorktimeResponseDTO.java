@@ -15,8 +15,8 @@ import com.tempo.application.model.worktime.Worktime;
 public class WorktimeResponseDTO {
     private Integer id;
     private String type; // "SINGLE"
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startHour;
+    private LocalDateTime endHour;
     private Integer categoryId;
     private String categoryName;
     private Long duration;
@@ -25,8 +25,8 @@ public class WorktimeResponseDTO {
         return WorktimeResponseDTO.builder()
                 .id(worktime.getId())
                 .type("SINGLE")
-                .startTime(worktime.getStartTime())
-                .endTime(worktime.getEndTime())
+                .startHour(worktime.getStartHour())
+                .endHour(worktime.getEndHour())
                 .categoryId(worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
                 .duration(worktime.getDuration())

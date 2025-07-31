@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import com.tempo.application.model.user.User;
 import com.tempo.application.model.worktime.Worktime;
 import com.tempo.application.model.category.Category;
-import com.tempo.application.model.worktime.DTO.CategoryStatDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,13 +19,13 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     List<Worktime> findByUserId(Integer userId);
 
     // Retourne tous les worktimes pour une plage de dates
-    List<Worktime> findByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+    List<Worktime> findByStartHourBetween(LocalDateTime start, LocalDateTime end);
     
     // Retourne tous les worktimes pour une plage de dates et un utilisateur spécifique
-    List<Worktime> findByStartTimeBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
+    List<Worktime> findByStartHourBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
 
     // Récupère tous les worktimes en cours (sans endTime) pour un utilisateur
-    List<Worktime> findByUserAndEndTimeIsNull(User user);
+    List<Worktime> findByUserAndEndHourIsNull(User user);
 
     void deleteByCategory(Category category);
 

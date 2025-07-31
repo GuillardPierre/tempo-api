@@ -2,18 +2,15 @@ package com.tempo.application.model.worktime;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tempo.application.model.category.Category;
-import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.model.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -39,10 +36,10 @@ public class Worktime {
     private int id;
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime startTime;
+    private LocalDateTime startHour;
 
     // Format ISO-8601 (2025-04-26T13:30)
-    private LocalDateTime endTime;
+    private LocalDateTime endHour;
 
     @ManyToOne(optional = false)
     @lombok.ToString.Exclude
@@ -59,12 +56,12 @@ public class Worktime {
 
     @Transient
     public Long getDuration() {
-        if (startTime == null || endTime == null) {
+        if (startHour == null || endHour == null) {
             return null;
         }
 
         try {
-            Duration duration = Duration.between(startTime, endTime);
+            Duration duration = Duration.between(startHour, endHour);
             return duration.toMinutes();
         } catch (Exception e) {
             return null;

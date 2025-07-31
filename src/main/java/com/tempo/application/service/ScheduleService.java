@@ -2,6 +2,7 @@ package com.tempo.application.service;
 
 import com.tempo.application.model.schedule.ScheduleDateEntryDTO;
 import com.tempo.application.model.schedule.ScheduleEntryDTO;
+import com.tempo.application.model.schedule.ScheduleThreeDaysDTO;
 import com.tempo.application.model.worktime.Worktime;
 import com.tempo.application.model.worktimeSeries.WorktimeSeries;
 import org.slf4j.Logger;
@@ -55,14 +56,14 @@ public class ScheduleService {
                 .map(ScheduleEntryDTO::fromWorkTimeSeries)
                 .collect(Collectors.toList());
         schedule.addAll(workTimeSeriesDTOs);
-
-        // Récupérer les Worktime en cours (sans endTime) - considérés comme des chronos actifs
+        // Récupérer les Worktime en cours (ceux qui n'ont pas de endTime) - considérés comme des chronos actifs
+        // Cette section permet d'ajouter à l'emploi du temps les chronos en cours pour l'utilisateur donné
         List<Worktime> ongoingWorktimes = worktimeService.getOngoingWorktimesByUserId(userId);
         List<ScheduleEntryDTO> ongoingWorktimeDTOs = ongoingWorktimes.stream()
                 .map(worktime -> ScheduleEntryDTO.builder()
                         .id((long) worktime.getId())
                         .type("CHRONO")
-                        .startTime(worktime.getStartTime())
+                        .startTime(worktime.getStartHour())
                         .categoryId((long) worktime.getCategory().getId())
                         .categoryName(worktime.getCategory().getName())
                         .build())
@@ -163,5 +164,15 @@ public class ScheduleService {
         schedule.addAll(workTimeSeriesDTOs);
 
         return schedule;
+    }
+
+    public ScheduleThreeDaysDTO getUserScheduleForThreeDays(LocalDate date, Integer userId) {
+        LoggerUtils.info(logger, "Getting schedule for three days around: " + date + " for user id: " + userId);
+        
+        return ScheduleThreeDaysDTO.builder()
+            .yesterday(getUserScheduleByDate(date.minusDays(1), userId))
+            .today(getUserScheduleByDate(date, userId))
+            .tomorrow(getUserScheduleByDate(date.plusDays(1), userId))
+            .build();
     }
 }

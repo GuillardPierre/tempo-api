@@ -171,8 +171,8 @@ public class DDLGenerator {
                 -- Table des créneaux de travail
                 CREATE TABLE IF NOT EXISTS public.worktime (
                     id SERIAL PRIMARY KEY,
-                    start_time TIMESTAMP NOT NULL,
-                    end_time TIMESTAMP,
+                    start_hour TIMESTAMP NOT NULL,
+                    end_hour TIMESTAMP,
                     user_id INTEGER NOT NULL,
                     category_id INTEGER NOT NULL,
                     CONSTRAINT fk_worktime_user FOREIGN KEY (user_id) REFERENCES public."user"(id),
@@ -189,8 +189,8 @@ public class DDLGenerator {
                     id BIGSERIAL PRIMARY KEY,
                     start_date TIMESTAMP NOT NULL,
                     end_date TIMESTAMP,
-                    start_time TIMESTAMP,
-                    end_time TIMESTAMP,
+                    start_hour TIMESTAMP NOT NULL,
+                    end_hour TIMESTAMP NOT NULL,
                     recurrence VARCHAR(255),
                     ignore_exceptions BOOLEAN DEFAULT false,
                     user_id INTEGER NOT NULL,
@@ -248,8 +248,13 @@ public class DDLGenerator {
                 -- Index pour améliorer les performances
                 CREATE INDEX IF NOT EXISTS idx_worktime_user_id ON public.worktime(user_id);
                 CREATE INDEX IF NOT EXISTS idx_worktime_category_id ON public.worktime(category_id);
-                CREATE INDEX IF NOT EXISTS idx_worktime_start_time ON public.worktime(start_time);
+                CREATE INDEX IF NOT EXISTS idx_worktime_start_hour ON public.worktime(start_hour);
+                CREATE INDEX IF NOT EXISTS idx_worktime_end_hour ON public.worktime(end_hour);
                 CREATE INDEX IF NOT EXISTS idx_worktime_series_user_id ON public.worktime_series(user_id);
+                CREATE INDEX IF NOT EXISTS idx_worktime_series_start_date ON public.worktime_series(start_date);
+                CREATE INDEX IF NOT EXISTS idx_worktime_series_end_date ON public.worktime_series(end_date);
+                CREATE INDEX IF NOT EXISTS idx_worktime_series_start_hour ON public.worktime_series(start_hour);
+                CREATE INDEX IF NOT EXISTS idx_worktime_series_end_hour ON public.worktime_series(end_hour);
                 CREATE INDEX IF NOT EXISTS idx_category_user_id ON public.category(user_id);
                 CREATE INDEX IF NOT EXISTS idx_refresh_token_user_id ON public.refresh_token(user_id);
                 CREATE INDEX IF NOT EXISTS idx_refresh_token_expiry ON public.refresh_token(expiry_date);

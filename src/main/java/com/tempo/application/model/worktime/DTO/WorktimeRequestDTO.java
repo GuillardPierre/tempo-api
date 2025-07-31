@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Data
 public class WorktimeRequestDTO {
     private Integer id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startHour;
+    private LocalDateTime endHour;
     private Category category;
 
     @Data

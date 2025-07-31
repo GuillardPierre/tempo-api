@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tempo.application.model.schedule.ScheduleDateEntryDTO;
 import com.tempo.application.model.schedule.ScheduleEntryDTO;
+import com.tempo.application.model.schedule.ScheduleThreeDaysDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.ScheduleService;
@@ -63,10 +64,15 @@ public class ScheduleController {
                 LoggerUtils.error(logger, "Invalid date format: " + date);
                 return ResponseEntity.badRequest().body("Invalid date format. Use YYYY-MM-DD format.");
             }
-            
-            List<ScheduleEntryDTO> scheduleEntries = scheduleService.getUserScheduleByDate(localDate, user.getId());
-            
-            return ResponseEntity.ok(scheduleEntries);
+            List<ScheduleEntryDTO> yesterday = scheduleService.getUserScheduleByDate(localDate.minusDays(1), user.getId());
+            List<ScheduleEntryDTO> today = scheduleService.getUserScheduleByDate(localDate, user.getId());
+            List<ScheduleEntryDTO> tomorrow = scheduleService.getUserScheduleByDate(localDate.plusDays(1), user.getId());
+            ScheduleThreeDaysDTO scheduleThreeDays = ScheduleThreeDaysDTO.builder()
+                .yesterday(yesterday)
+                .today(today)
+                .tomorrow(tomorrow)
+                .build();
+            return ResponseEntity.ok(scheduleThreeDays);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving user schedule: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error retrieving user schedule: " + e.getMessage());

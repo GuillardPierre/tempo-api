@@ -55,15 +55,15 @@ public class WorktimeSeriesService {
         }
 
         // Vérification des nouveaux champs startTime et endTime
-        if (request.getStartTime() == null) {
+        if (request.getStartHour() == null) {
             throw new IllegalArgumentException("Start time is required.");
         }
         
-        if (request.getEndTime() == null) {
+        if (request.getEndHour() == null) {
             throw new IllegalArgumentException("End time is required.");
         }
         
-        if (request.getStartTime().isAfter(request.getEndTime())) {
+        if (request.getStartHour().isAfter(request.getEndHour())) {
             throw new IllegalArgumentException("Start time must be before end time.");
         }
 
@@ -127,8 +127,8 @@ public class WorktimeSeriesService {
         }
 
         // Vérification des nouveaux champs startTime et endTime
-        if (request.getStartTime() != null && request.getEndTime() != null && 
-            request.getStartTime().isAfter(request.getEndTime())) {
+        if (request.getStartHour() != null && request.getEndHour() != null && 
+            request.getStartHour().isAfter(request.getEndHour())) {
             throw new IllegalArgumentException("Start time must be before end time.");
         }
 
@@ -157,11 +157,11 @@ public class WorktimeSeriesService {
         existingSeries.setStartDate(request.getStartDate());
         existingSeries.setEndDate(request.getEndDate());
         
-        if (request.getStartTime() != null) {
-            existingSeries.setStartTime(request.getStartTime());
+        if (request.getStartHour() != null) {
+            existingSeries.setStartHour(request.getStartHour());
         }
-        if (request.getEndTime() != null) {
-            existingSeries.setEndTime(request.getEndTime());
+        if (request.getEndHour() != null) {
+            existingSeries.setEndHour(request.getEndHour());
         }
 
         // Gestion des exceptions de récurrence

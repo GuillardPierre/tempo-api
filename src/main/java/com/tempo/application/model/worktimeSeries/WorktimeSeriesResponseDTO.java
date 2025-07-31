@@ -15,8 +15,8 @@ public class WorktimeSeriesResponseDTO {
     private String type; // "RECURRING"
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startHour;
+    private LocalDateTime endHour;
     private int categoryId;
     private String categoryName;
     private String recurrence;
@@ -28,8 +28,8 @@ public class WorktimeSeriesResponseDTO {
                 .type("RECURRING")
                 .startDate(series.getStartDate())
                 .endDate(series.getEndDate())
-                .startTime(series.getStartTime())
-                .endTime(series.getEndTime())
+                .startHour(series.getStartHour())
+                .endHour(series.getEndHour())
                 .categoryId(series.getCategory().getId())
                 .categoryName(series.getCategory().getName())
                 .recurrence(series.getRecurrence())
