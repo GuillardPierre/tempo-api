@@ -31,20 +31,20 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
 
     @Query(
       value = "SELECT c.name as name, " +
-              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS INTEGER) as duration " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_hour - w.start_hour))/60) AS INTEGER) as duration " +
               "FROM worktime w " +
               "JOIN category c ON w.category_id = c.id " +
               "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.end_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
+              "AND w.start_hour >= :from " +
+              "AND w.end_hour <= :to " +
+              "AND w.end_hour IS NOT NULL " +
               "AND NOT EXISTS (" +
               "    SELECT 1 FROM recurrence_exception_series res " +
               "    JOIN recurrence_exception e ON res.exception_id = e.id " +
               "    JOIN worktime_series s ON res.series_id = s.id " +
               "    WHERE s.ignore_exceptions = false " +
-              "    AND w.start_time >= e.pause_start " +
-              "    AND w.end_time <= e.pause_end" +
+              "    AND w.start_hour >= e.pause_start " +
+              "    AND w.end_hour <= e.pause_end" +
               ") " +
               "GROUP BY c.name",
       nativeQuery = true)
@@ -54,13 +54,13 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
 
     @Query(
       value = "SELECT c.name as name, " +
-              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS INTEGER) as duration " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_hour - w.start_hour))/60) AS INTEGER) as duration " +
               "FROM worktime w " +
               "JOIN category c ON w.category_id = c.id " +
               "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.end_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
+              "AND w.start_hour >= :from " +
+              "AND w.end_hour <= :to " +
+              "AND w.end_hour IS NOT NULL " +
               "GROUP BY c.name",
       nativeQuery = true)
     List<Object[]> getCategoryStatsByUserAndPeriod(@Param("userId") Integer userId,
@@ -68,14 +68,14 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
                                                           @Param("to") LocalDateTime to);
 
     @Query(
-      value = "SELECT DATE(w.start_time) as date, " +
-              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
+      value = "SELECT DATE(w.start_hour) as date, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_hour - w.start_hour))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.start_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
-              "GROUP BY DATE(w.start_time)",
+              "AND w.start_hour >= :from " +
+              "AND w.start_hour <= :to " +
+              "AND w.end_hour IS NOT NULL " +
+              "GROUP BY DATE(w.start_hour)",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByDay(
         @Param("userId") Integer userId,
@@ -84,14 +84,14 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     );
 
     @Query(
-      value = "SELECT TO_CHAR(w.start_time, 'YYYY-MM') as period, " +
-              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
+      value = "SELECT TO_CHAR(w.start_hour, 'YYYY-MM') as period, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_hour - w.start_hour))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.start_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
-              "GROUP BY TO_CHAR(w.start_time, 'YYYY-MM')",
+              "AND w.start_hour >= :from " +
+              "AND w.start_hour <= :to " +
+              "AND w.end_hour IS NOT NULL " +
+              "GROUP BY TO_CHAR(w.start_hour, 'YYYY-MM')",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByMonth(
         @Param("userId") Integer userId,
@@ -100,14 +100,14 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
     );
 
     @Query(
-      value = "SELECT EXTRACT(YEAR FROM w.start_time) as y, EXTRACT(WEEK FROM w.start_time) as w, " +
-              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_time - w.start_time))/60) AS BIGINT) as duration " +
+      value = "SELECT EXTRACT(YEAR FROM w.start_hour) as y, EXTRACT(WEEK FROM w.start_hour) as w, " +
+              "CAST(SUM(EXTRACT(EPOCH FROM (w.end_hour - w.start_hour))/60) AS BIGINT) as duration " +
               "FROM worktime w " +
               "WHERE w.user_id = :userId " +
-              "AND w.start_time >= :from " +
-              "AND w.start_time <= :to " +
-              "AND w.end_time IS NOT NULL " +
-              "GROUP BY EXTRACT(YEAR FROM w.start_time), EXTRACT(WEEK FROM w.start_time)",
+              "AND w.start_hour >= :from " +
+              "AND w.start_hour <= :to " +
+              "AND w.end_hour IS NOT NULL " +
+              "GROUP BY EXTRACT(YEAR FROM w.start_hour), EXTRACT(WEEK FROM w.start_hour)",
       nativeQuery = true)
     List<Object[]> getTotalWorktimeByUserAndPeriodGroupByWeek(
         @Param("userId") Integer userId,

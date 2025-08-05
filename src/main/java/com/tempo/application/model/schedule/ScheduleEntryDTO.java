@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class ScheduleEntryDTO {
     private Long id;
     private String type;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startHour;
+    private LocalDateTime endHour;
     private LocalDateTime startDate;
     private LocalDateTime endDate; 
     private Long duration;
@@ -34,8 +34,8 @@ public class ScheduleEntryDTO {
         return ScheduleEntryDTO.builder()
                 .id((long) worktime.getId())
                 .type("SINGLE")
-                .startTime(worktime.getStartHour())
-                .endTime(worktime.getEndHour())
+                .startHour(worktime.getStartHour())
+                .endHour(worktime.getEndHour())
                 .duration(worktime.getDuration())
                 .categoryId((long) worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
@@ -49,8 +49,8 @@ public class ScheduleEntryDTO {
                 .type("RECURRING")
                 .startDate(workTimeSeries.getStartDate())
                 .endDate(workTimeSeries.getEndDate())
-                .startTime(workTimeSeries.getStartHour())  
-                .endTime(workTimeSeries.getEndHour())        
+                .startHour(workTimeSeries.getStartHour())  
+                .endHour(workTimeSeries.getEndHour())        
                 .recurrence(workTimeSeries.getRecurrence())
                 .duration(workTimeSeries.getDuration())
                 .categoryId((long) workTimeSeries.getCategory().getId())

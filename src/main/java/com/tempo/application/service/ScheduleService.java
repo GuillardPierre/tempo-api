@@ -38,9 +38,10 @@ public class ScheduleService {
     public List<ScheduleEntryDTO> getUserScheduleByDate(LocalDate date, Integer userId) {
         List<ScheduleEntryDTO> schedule = new ArrayList<>();
 
-        // Récupérer les Worktime pour cette date
+        // Récupérer les Worktime terminés pour cette date (excluant les chronos en cours)
         List<Worktime> worktimes = worktimeService.getAllUserWorktimesByDateAndUserId(date, userId);
         List<ScheduleEntryDTO> worktimeDTOs = worktimes.stream()
+                .filter(worktime -> worktime.getEndHour() != null) // Exclure les chronos en cours pour éviter la duplication
                 .map(ScheduleEntryDTO::fromWorktime)
                 .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
@@ -63,7 +64,7 @@ public class ScheduleService {
                 .map(worktime -> ScheduleEntryDTO.builder()
                         .id((long) worktime.getId())
                         .type("CHRONO")
-                        .startTime(worktime.getStartHour())
+                        .startHour(worktime.getStartHour())
                         .categoryId((long) worktime.getCategory().getId())
                         .categoryName(worktime.getCategory().getName())
                         .build())
@@ -72,7 +73,7 @@ public class ScheduleService {
 
         return schedule.stream()
             .sorted(Comparator.comparing(
-                entry -> entry.getStartTime() != null ? entry.getStartTime().toLocalTime() : null,
+                entry -> entry.getStartHour() != null ? entry.getStartHour().toLocalTime() : null,
                 Comparator.nullsLast(Comparator.naturalOrder())
             ))
             .collect(Collectors.toList());
