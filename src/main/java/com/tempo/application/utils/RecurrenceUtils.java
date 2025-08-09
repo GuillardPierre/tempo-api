@@ -18,9 +18,24 @@ public class RecurrenceUtils {
      */
     public static List<LocalDateTime> generateOccurrences(
             String rrule,
-            LocalDateTime start,
+            LocalDateTime seriesStartDate,
             LocalDateTime from,
             LocalDateTime to) {
+        // Conserve l'ancienne signature pour compatibilité en ancrant sur seriesStartDate
+        return generateOccurrences(rrule, seriesStartDate, from, to, seriesStartDate);
+    }
+
+    /**
+     * Variante avec ancrage d'heure distinct de la date de début de la série.
+     * Permet d'utiliser par exemple startHour pour caler l'heure/minute de chaque occurrence,
+     * tout en conservant la borne de début (date) basée sur seriesStartDate.
+     */
+    public static List<LocalDateTime> generateOccurrences(
+            String rrule,
+            LocalDateTime seriesStartDate,
+            LocalDateTime from,
+            LocalDateTime to,
+            LocalDateTime anchorStartHour) {
         List<LocalDateTime> occurrences = new ArrayList<>();
         if (rrule == null || !rrule.startsWith("FREQ=WEEKLY")) {
             // On ne gère que les règles hebdomadaires simples
@@ -53,11 +68,16 @@ public class RecurrenceUtils {
             return occurrences;
         }
         // Générer les occurrences
-        LocalDateTime current = start.isBefore(from) ? from : start;
+        LocalDateTime current = seriesStartDate.isBefore(from) ? from : seriesStartDate;
+        LocalDateTime anchor = anchorStartHour != null ? anchorStartHour : seriesStartDate;
         // On commence à la première semaine qui intersecte la période
         while (!current.isAfter(to)) {
-            if (!current.isBefore(start) && daysOfWeek.contains(current.getDayOfWeek())) {
-                occurrences.add(current.withHour(start.getHour()).withMinute(start.getMinute()).withSecond(0).withNano(0));
+            if (!current.isBefore(seriesStartDate) && daysOfWeek.contains(current.getDayOfWeek())) {
+                occurrences.add(current
+                        .withHour(anchor.getHour())
+                        .withMinute(anchor.getMinute())
+                        .withSecond(0)
+                        .withNano(0));
             }
             current = current.plusDays(1);
         }

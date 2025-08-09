@@ -40,20 +40,22 @@ public class StatsService {
         // 2. Récupérer les séries récurrentes
         List<WorktimeSeries> seriesList = workTimeSeriesRepository.findByUserAndPeriod(userId, from, to);
         for (WorktimeSeries series : seriesList) {
-            // LocalDateTime recurrenceEnd = calculateRecurrenceEnd(series, to);
+            LocalDateTime recurrenceEnd = calculateRecurrenceEnd(series, to);
+
+            String catName = series.getCategory() != null ? series.getCategory().getName() : "<no-cat>";
+            Boolean ignoreExceptions = series.getIgnoreExceptions();
 
             // Si ignoreExceptions est true, on traite la série normalement
             // Si ignoreExceptions est null, on considère qu'il est false
-            Boolean ignoreExceptions = series.getIgnoreExceptions();
             if (Boolean.TRUE.equals(ignoreExceptions)) {
                 List<LocalDateTime> occurrences = RecurrenceUtils.generateOccurrences(
                     series.getRecurrence(),
                     series.getStartDate(),
                     from,
-                    to
+                    recurrenceEnd,
+                    series.getStartHour() != null ? series.getStartHour() : series.getStartDate()
                 );
                 int totalMinutes = occurrences.size() * series.getDuration().intValue();
-                String catName = series.getCategory().getName();
                 totalDurations.merge(catName, totalMinutes, Integer::sum);
                 continue;
             }
@@ -63,7 +65,8 @@ public class StatsService {
                 series.getRecurrence(),
                 series.getStartDate(),
                 from,
-                to
+                recurrenceEnd,
+                series.getStartHour() != null ? series.getStartHour() : series.getStartDate()
             );
             
             if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
@@ -78,14 +81,14 @@ public class StatsService {
             }
             
             int totalMinutes = occurrences.size() * series.getDuration().intValue();
-            String catName = series.getCategory().getName();
             totalDurations.merge(catName, totalMinutes, Integer::sum);
         }
 
         // 3. Retourner la liste finale
-        return totalDurations.entrySet().stream()
+        List<CategoryStatDTO> result = totalDurations.entrySet().stream()
             .map(e -> new CategoryStatDTO(e.getKey(), e.getValue()))
             .collect(Collectors.toList());
+        return result;
     }
 
     /**
@@ -118,6 +121,7 @@ public class StatsService {
                 period = ((java.sql.Date) row[0]).toLocalDate().toString();
                 int duration = ((Number) row[1]).intValue();
                 totalByPeriod.put(period, duration);
+                 
             }
         }
 
@@ -134,7 +138,8 @@ public class StatsService {
                     series.getRecurrence(),
                     series.getStartDate(),
                     from,
-                    recurrenceEnd
+                    recurrenceEnd,
+                    series.getStartHour() != null ? series.getStartHour() : series.getStartDate()
                 );
                 for (LocalDateTime occ : occurrences) {
                     String period = formatPeriod(occ, type);
@@ -149,7 +154,8 @@ public class StatsService {
                 series.getRecurrence(),
                 series.getStartDate(),
                 from,
-                recurrenceEnd
+                recurrenceEnd,
+                series.getStartHour() != null ? series.getStartHour() : series.getStartDate()
             );
 
             if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
