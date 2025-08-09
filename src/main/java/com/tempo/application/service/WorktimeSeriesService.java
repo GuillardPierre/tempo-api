@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Set; 
 
 import org.springframework.cache.annotation.CacheEvict;
 
@@ -93,7 +94,11 @@ public class WorktimeSeriesService {
             
             // Mettre à jour la relation bidirectionnelle
             for (RecurrenceException exception : overlappingExceptions) {
-                exception.getSeries().add(request);
+                boolean alreadyLinked = exception.getSeries().stream()
+                    .anyMatch(series -> series.getId() != null && series.getId().equals(request.getId()));
+                if (!alreadyLinked) {
+                    exception.getSeries().add(request);
+                }
             }
         }
 
@@ -170,10 +175,17 @@ public class WorktimeSeriesService {
             
             if (Boolean.TRUE.equals(request.getIgnoreExceptions())) {
                 // Si on ignore maintenant les exceptions, on supprime toutes les liaisons
-                for (RecurrenceException exception : existingSeries.getExceptions()) {
-                    exception.getSeries().remove(existingSeries);
+                List<RecurrenceException> toSave = new ArrayList<>();
+                List<RecurrenceException> currentExceptions = new ArrayList<>(existingSeries.getExceptions());
+                for (RecurrenceException exception : currentExceptions) {
+                    // Retirer côté propriétaire par ID pour éviter les problèmes d'equals()
+                    exception.getSeries().removeIf(s -> s.getId() != null && s.getId().equals(existingSeries.getId()));
+                    toSave.add(exception);
                 }
                 existingSeries.getExceptions().clear();
+                if (!toSave.isEmpty()) {
+                    recurrenceExceptionRepository.saveAll(toSave);
+                }
             } else {
                 // Si on ne les ignore plus, on cherche les exceptions qui se chevauchent
                 List<RecurrenceException> overlappingExceptions = recurrenceExceptionRepository.findOverlappingExceptions(
@@ -181,20 +193,45 @@ public class WorktimeSeriesService {
                     existingSeries.getEndDate() != null ? existingSeries.getEndDate() : LocalDateTime.now().plusYears(100)
                 );
 
-                // Mettre à jour les liaisons
+                // Calculer le delta entre actuel et overlap
+                Set<Long> overlapIds = overlappingExceptions.stream()
+                    .map(RecurrenceException::getId)
+                    .collect(java.util.stream.Collectors.toSet());
+
+                List<RecurrenceException> toSave = new ArrayList<>();
+
+                // Retirer les liens obsolètes (présents actuellement mais pas dans overlap)
+                List<RecurrenceException> currentExceptions = new ArrayList<>(existingSeries.getExceptions());
+                for (RecurrenceException exception : currentExceptions) {
+                    if (exception.getId() != null && !overlapIds.contains(exception.getId())) {
+                        exception.getSeries().removeIf(s -> s.getId() != null && s.getId().equals(existingSeries.getId()));
+                        toSave.add(exception);
+                    }
+                }
+
+                // Ajouter les nouveaux liens (dans overlap mais pas encore liés côté propriétaire)
+                for (RecurrenceException exception : overlappingExceptions) {
+                    boolean alreadyLinked = exception.getSeries().stream()
+                        .anyMatch(s -> s.getId() != null && s.getId().equals(existingSeries.getId()));
+                    if (!alreadyLinked) {
+                        exception.getSeries().add(existingSeries);
+                        toSave.add(exception);
+                    }
+                }
+
+                // Mettre à jour la collection côté inverse pour rester cohérent
                 existingSeries.getExceptions().clear();
                 existingSeries.getExceptions().addAll(overlappingExceptions);
-                
-                // Mettre à jour la relation bidirectionnelle
-                for (RecurrenceException exception : overlappingExceptions) {
-                    exception.getSeries().add(existingSeries);
+
+                if (!toSave.isEmpty()) {
+                    recurrenceExceptionRepository.saveAll(toSave);
                 }
             }
         }
         
         WorktimeSeries savedSeries = repository.save(existingSeries);
 
-        // Sauvegarder les exceptions mises à jour si nécessaire
+        // Sauvegarder les exceptions restantes liées si nécessaire (préservation)
         if (!Boolean.TRUE.equals(savedSeries.getIgnoreExceptions()) && !savedSeries.getExceptions().isEmpty()) {
             recurrenceExceptionRepository.saveAll(savedSeries.getExceptions());
         }
