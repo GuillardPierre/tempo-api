@@ -311,19 +311,27 @@ public class WorktimeSeriesService {
      * @return La liste des séries actives à cette date pour cet utilisateur
      */
     public List<WorktimeSeries> getActiveWorkTimeSeriesForDateAndUser(LocalDate date, Integer userId) {
-        LoggerUtils.info(logger, "Fetching active worktime series for date: " + date + " and user id: " + userId);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         LocalDateTime targetDate = date.atStartOfDay();
         List<WorktimeSeries> allActiveSeries = repository.findByUser(user);
-        return allActiveSeries.stream()
+        
+        List<WorktimeSeries> filteredSeries = allActiveSeries.stream()
             .filter(series -> {
-                boolean afterStart = series.getStartDate().isBefore(targetDate) || series.getStartDate().isEqual(targetDate);
+                // CORRECTION : Une série est active si elle commence AVANT ou LE MÊME JOUR que la date de test
+                // Ancienne logique : afterStart = series.getStartDate().isBefore(targetDate) || series.getStartDate().isEqual(targetDate);
+                // Nouvelle logique : afterStart = true si la série commence le même jour ou avant
+                boolean afterStart = series.getStartDate().toLocalDate().isBefore(date) || series.getStartDate().toLocalDate().isEqual(date);
                 boolean beforeEnd = series.getEndDate() == null || targetDate.isBefore(series.getEndDate()) || targetDate.isEqual(series.getEndDate());
                 boolean matchesRecurrence = series.getRecurrence() != null;
-                return afterStart && beforeEnd && matchesRecurrence;
+                
+                boolean isActive = afterStart && beforeEnd && matchesRecurrence;
+                
+                return isActive;
             })
             .collect(Collectors.toList());
+            
+        return filteredSeries;
     }
 
     /**

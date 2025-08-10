@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.tempo.application.model.recurrenceException.RecurrenceException;
 
 @Service
 public class StatsService {
@@ -24,6 +25,21 @@ public class StatsService {
         return (series.getEndDate() != null && series.getEndDate().isBefore(requestedEndDate)) 
             ? series.getEndDate() 
             : requestedEndDate;
+    }
+
+    /**
+     * Vérifie si une occurrence tombe dans la période d'une exception.
+     * Une occurrence est considérée comme "dans l'exception" si elle tombe
+     * le même jour que la période d'exception (même si elle est après la fin de la pause).
+     * 
+     * @param occurrence La date/heure de l'occurrence à vérifier
+     * @param exception L'exception à vérifier
+     * @return true si l'occurrence est dans la période d'exception, false sinon
+     */
+    private boolean isInExceptionPeriod(LocalDateTime occurrence, RecurrenceException exception) {
+        // Vérifier si l'occurrence tombe le même jour que la période d'exception
+        return !occurrence.toLocalDate().isBefore(exception.getPauseStart().toLocalDate()) &&
+               !occurrence.toLocalDate().isAfter(exception.getPauseEnd().toLocalDate());
     }
 
     @Cacheable(value = "categoryStats", key = "#userId + ':' + #from + ':' + #to")
@@ -72,10 +88,7 @@ public class StatsService {
             if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
                 occurrences = occurrences.stream()
                     .filter(occ -> series.getExceptions().stream()
-                        .noneMatch(ex -> 
-                            (occ.isEqual(ex.getPauseStart()) || occ.isAfter(ex.getPauseStart())) &&
-                            (occ.isEqual(ex.getPauseEnd()) || occ.isBefore(ex.getPauseEnd()))
-                        )
+                        .noneMatch(ex -> isInExceptionPeriod(occ, ex))
                     )
                     .collect(Collectors.toList());
             }
@@ -161,10 +174,7 @@ public class StatsService {
             if (series.getExceptions() != null && !series.getExceptions().isEmpty()) {
                 occurrences = occurrences.stream()
                     .filter(occ -> series.getExceptions().stream()
-                        .noneMatch(ex -> 
-                            (occ.isEqual(ex.getPauseStart()) || occ.isAfter(ex.getPauseStart())) &&
-                            (occ.isEqual(ex.getPauseEnd()) || occ.isBefore(ex.getPauseEnd()))
-                        )
+                        .noneMatch(ex -> isInExceptionPeriod(occ, ex))
                     )
                     .collect(Collectors.toList());
             }

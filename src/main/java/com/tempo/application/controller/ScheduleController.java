@@ -47,34 +47,25 @@ public class ScheduleController {
     public ResponseEntity<?> getUserScheduleByDate(@PathVariable String date) {
         try {
             LoggerUtils.info(logger, "Fetching user schedule for date: " + date);
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            LocalDate localDate = LocalDate.parse(date);
+            LocalDate yesterdayDate = localDate.minusDays(1);
+            LocalDate todayDate = localDate;
+            LocalDate tomorrowDate = localDate.plusDays(1);
             
-            if (user == null) {
-                LoggerUtils.error(logger, "User not found for email: " + email);
-                return ResponseEntity.badRequest().body("User not found");
-            }
+            List<ScheduleEntryDTO> yesterday = scheduleService.getUserScheduleByDate(yesterdayDate, user.getId());
+            List<ScheduleEntryDTO> today = scheduleService.getUserScheduleByDate(todayDate, user.getId());
+            List<ScheduleEntryDTO> tomorrow = scheduleService.getUserScheduleByDate(tomorrowDate, user.getId());
             
-            LocalDate localDate;
-            try {
-                localDate = LocalDate.parse(date);
-            } catch (Exception e) {
-                LoggerUtils.error(logger, "Invalid date format: " + date);
-                return ResponseEntity.badRequest().body("Invalid date format. Use YYYY-MM-DD format.");
-            }
-            List<ScheduleEntryDTO> yesterday = scheduleService.getUserScheduleByDate(localDate.minusDays(1), user.getId());
-            List<ScheduleEntryDTO> today = scheduleService.getUserScheduleByDate(localDate, user.getId());
-            List<ScheduleEntryDTO> tomorrow = scheduleService.getUserScheduleByDate(localDate.plusDays(1), user.getId());
             ScheduleThreeDaysDTO scheduleThreeDays = ScheduleThreeDaysDTO.builder()
                 .yesterday(yesterday)
                 .today(today)
                 .tomorrow(tomorrow)
                 .build();
+            
             return ResponseEntity.ok(scheduleThreeDays);
         } catch (Exception e) {
-            LoggerUtils.error(logger, "Error retrieving user schedule: " + e.getMessage(), e);
+            LoggerUtils.error(logger, "Error fetching user schedule for date: " + date, e);
             return ResponseEntity.badRequest().body("Error retrieving user schedule: " + e.getMessage());
         }
     }
