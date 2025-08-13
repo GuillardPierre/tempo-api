@@ -157,6 +157,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<mainClass>com.tempo.application.TempoApiApplication</mainClass>
 					<excludes>
 						<exclude>
 						<groupId>org.projectlombok</groupId>

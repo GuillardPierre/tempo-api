@@ -34,6 +34,15 @@ build/
 
 logs/
 .env
+.env.local
+.env.production
+
+# Heroku
+.heroku/
+
+# Scripts de production (optionnel)
+# scripts/run-migrations-prod.sh
+# scripts/deploy-heroku.sh
 
 TODO.md
 DEPLOY.md

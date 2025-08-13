@@ -1,0 +1,27 @@
+# Docker Compose pour la production (sans base de données)
+# La base de données sera hébergée sur Heroku Postgres
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile.prod
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xmx512m -Xms256m
+      # Les variables de base de données seront fournies par Heroku
+      # - JDBC_DATABASE_URL=${JDBC_DATABASE_URL}
+      # - JDBC_DATABASE_USERNAME=${JDBC_DATABASE_USERNAME}
+      # - JDBC_DATABASE_PASSWORD=${JDBC_DATABASE_PASSWORD}
+      # - APP_SECRET_KEY=${APP_SECRET_KEY}
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+

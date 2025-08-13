@@ -1,0 +1,30 @@
+{
+  "name": "tempo-api",
+  "description": "API Tempo pour la gestion du temps de travail",
+  "repository": "https://github.com/GuillardPierre/tempo-api",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["java", "spring-boot", "api", "tempo"],
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0",
+      "as": "DATABASE"
+    }
+  ],
+  "env": {
+    "SPRING_PROFILES_ACTIVE": {
+      "value": "prod",
+      "description": "Profil Spring Boot pour la production"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ]
+}
