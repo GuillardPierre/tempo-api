@@ -10,11 +10,11 @@ import lombok.Setter;
 @Setter
 public class UserCreateDto {
     @NotBlank(message = "username is mandatory")
-    private  String username;
+    private String username;
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email format is invalid")
     private String email;
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 4, message = "Password must be at least 8 characters long")
     private String password;
 }

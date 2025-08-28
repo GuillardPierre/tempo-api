@@ -51,17 +51,6 @@ psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE tempo_db TO tempo_user;"
 ./db-dev-tools.sh info
 ```
 
-**Résultat attendu :**
-
-```
-Schema version: << Empty Schema >>
-+----------+---------+---------------------+------+--------------+-------+
-| Category | Version | Description         | Type | Installed On | State |
-+----------+---------+---------------------+------+--------------+-------+
-| Pending  | 001     | Initial schema      | SQL  |              |       |
-+----------+---------+---------------------+------+--------------+-------+
-```
-
 ## 🗄️ 3. Appliquer la Migration Initiale
 
 ```bash
@@ -200,76 +189,3 @@ psql -U tempo_user -d tempo_db
 -- Voir l'historique Flyway
 SELECT * FROM flyway_schema_history;
 ```
-
-## 🔄 9. Workflow de Développement
-
-### Modifie une Entité JPA
-
-1. **Modifier votre entité :**
-
-   ```java
-   @Entity
-   public class User {
-       // ... champs existants ...
-
-       // Nouveau champ
-       private String firstName;
-   }
-   ```
-
-2. **Générer la migration :**
-
-   ```bash
-   # Une fois les problèmes Lombok résolus
-   ./db-dev-tools.sh generate
-   ```
-
-3. **Vérifier et appliquer :**
-
-   ```bash
-   # Vérifier le contenu
-   cat src/main/resources/db/migration/V*__*.sql
-
-   # Appliquer
-   ./db-dev-tools.sh migrate
-   ```
-
-## 📝 10. Commandes Utiles
-
-```bash
-# Voir toutes les commandes disponibles
-./db-dev-tools.sh help
-
-# État rapide des migrations
-./mvnw flyway:info
-
-# Appliquer migrations directement
-./mvnw flyway:migrate
-
-# Valider migrations
-./mvnw flyway:validate
-
-# Debug avec logs détaillés
-./mvnw flyway:info -X
-```
-
-## 🎯 11. Prochaines Étapes
-
-Une fois le système testé et fonctionnel :
-
-1. **Résoudre les problèmes Lombok** pour activer la génération automatique DDL
-2. **Configurer les profils** production/développement
-3. **Ajouter des tests** d'intégration avec Testcontainers
-4. **Documenter** les nouvelles entités et migrations
-
----
-
-> 💡 **Conseil** : Gardez ce guide à portée de main pendant le développement !
-
-## 🆘 Support
-
-En cas de problème :
-
-1. Vérifiez les logs : `docker-compose -f compose.dev.postgresql.yml logs`
-2. Consultez `DATABASE_MIGRATIONS.md` pour plus de détails
-3. Utilisez `./db-dev-tools.sh help` pour voir toutes les options
