@@ -149,6 +149,11 @@
 			<artifactId>flyway-mysql</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- Email via SMTP -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

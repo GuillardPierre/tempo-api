@@ -34,13 +34,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
 @RestController
-@RequestMapping(path="/user")
+@RequestMapping(path = "/user")
 public class LoginController {
-    
+
     private static final Logger logger = LoggerUtils.getLogger(LoginController.class);
-    
+
     @Autowired
     private UserService userService;
 
@@ -54,7 +53,7 @@ public class LoginController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@Valid @RequestBody UserCreateDto request) { 
+    public ResponseEntity<?> signupUser(@Valid @RequestBody UserCreateDto request) {
         try {
             UserDto createdUser = userService.register(request);
             return ResponseEntity.ok(createdUser);
@@ -62,12 +61,12 @@ public class LoginController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             if (authentication.isAuthenticated()) {
                 User user = userService.findByEmail(request.getEmail());
                 Map<String, Object> authData = new HashMap<>();
@@ -92,17 +91,23 @@ public class LoginController {
 
         try {
             return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtUtils.generateToken(user.getEmail());
-                    Map<String, Object> authData = new HashMap<>();
-                    authData.put("refreshToken", requestRefreshToken);
-                    authData.put("token", token);
-                    authData.put("type", "Bearer");
-                    return ResponseEntity.ok(authData);
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token not found in database"));
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        // Générer un nouveau JWT token
+                        String token = jwtUtils.generateToken(user.getEmail());
+
+                        // Générer un nouveau refresh token (remplace l'ancien)
+                        String newRefreshToken = refreshTokenService.createRefreshToken(user.getEmail()).getToken();
+
+                        Map<String, Object> authData = new HashMap<>();
+                        authData.put("refreshToken", newRefreshToken);
+                        authData.put("token", token);
+                        authData.put("type", "Bearer");
+                        return ResponseEntity.ok(authData);
+                    })
+                    .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                            "Refresh token not found in database"));
         } catch (TokenRefreshException e) {
             LoggerUtils.error(logger, "Token refresh failed: " + e.getMessage(), e);
             Map<String, String> errorData = new HashMap<>();
@@ -119,7 +124,8 @@ public class LoginController {
         User connectedUser = userService.findByEmail(email);
 
         if (!connectedUser.getId().equals(id)) {
-            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Vous ne pouvez supprimer que votre propre compte."));
+            return ResponseEntity.status(403)
+                    .body(Collections.singletonMap("error", "Vous ne pouvez supprimer que votre propre compte."));
         }
 
         userService.deleteUserAndTokens(id);

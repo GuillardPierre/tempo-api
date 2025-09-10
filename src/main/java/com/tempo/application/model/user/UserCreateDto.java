@@ -15,6 +15,6 @@ public class UserCreateDto {
     @Email(message = "Email format is invalid")
     private String email;
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 4, message = "Password must be at least 8 characters long")
+    @Size(min = 4, message = "Password must be at least 4 characters long")
     private String password;
 }
