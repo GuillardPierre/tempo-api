@@ -1,6 +1,5 @@
 package com.tempo.application.security;
 
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +16,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.lang.NonNull;
 
 @Component
 @RequiredArgsConstructor
@@ -25,8 +28,25 @@ public class JwtFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
-    @Override 
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    // Liste des endpoints publics qui ne nécessitent pas de JWT
+    private final List<String> publicEndpoints = Arrays.asList(
+            "/user/signup",
+            "/user/login",
+            "/user/refresh-token",
+            "/user/password-reset/request",
+            "/user/password-reset/confirm");
+
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String requestPath = request.getRequestURI();
+
+        // Si l'endpoint est public, on passe directement au filtre suivant
+        if (isPublicEndpoint(requestPath)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
         String username = null;
@@ -42,7 +62,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtils.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticatonToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken authenticatonToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
                     authenticatonToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticatonToken);
                 }
@@ -58,6 +79,13 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Invalid or missing JWT\"}");
         }
+    }
+
+    /**
+     * Vérifie si l'endpoint demandé est dans la liste des endpoints publics
+     */
+    private boolean isPublicEndpoint(String requestPath) {
+        return publicEndpoints.stream().anyMatch(requestPath::startsWith);
     }
 
 }

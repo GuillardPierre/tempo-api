@@ -32,12 +32,13 @@ if ! heroku apps:info --app "$APP_NAME" &> /dev/null; then
     heroku create "$APP_NAME" --region eu
 fi
 
-# Ajouter l'add-on PostgreSQL si pas déjà présent
-echo "🗄️  Vérification de l'add-on PostgreSQL..."
-if ! heroku addons:info postgresql --app "$APP_NAME" &> /dev/null; then
-    echo "➕ Ajout de l'add-on PostgreSQL..."
-    heroku addons:create heroku-postgresql:essential-0 --app "$APP_NAME"
-fi
+
+# # Ajouter l'add-on PostgreSQL si pas déjà présent
+# echo "🗄️  Vérification de l'add-on PostgreSQL..."
+# if ! heroku addons:info postgresql --app "$APP_NAME" &> /dev/null; then
+#     echo "➕ Ajout de l'add-on PostgreSQL..."
+#     heroku addons:create heroku-postgresql:essential-0 --app "$APP_NAME"
+# fi
 
 # Compiler l'application
 echo "🔨 Compilation de l'application..."

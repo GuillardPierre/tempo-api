@@ -31,11 +31,21 @@ services:
       - JAVA_OPTS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=postgresql
       - SPRING_FLYWAY_ENABLED=true
+      - SPRING_MAIL_HOST=sandbox.smtp.mailtrap.io
+      - SPRING_MAIL_PORT=2525
+      - SPRING_MAIL_USERNAME=e4ec8298526063
+      - SPRING_MAIL_PASSWORD=923398148d7b76
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
+      - SPRING_MAIL_DEFAULT_ENCODING=UTF-8
+      - 'MAIL_FROM=Tempo <no-reply@tempo.app>'
       # Configuration DevTools
       - SPRING_DEVTOOLS_RESTART_ENABLED=true
       - SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
       - SPRING_DEVTOOLS_RESTART_POLL_INTERVAL=1000
       - SPRING_DEVTOOLS_RESTART_QUIET_PERIOD=400
+      
+
     ports:
       - '8080:8080'
       - '35729:35729' # Port pour LiveReload
