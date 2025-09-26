@@ -4,6 +4,7 @@ import com.tempo.application.error.ApiError;
 import com.tempo.application.model.recurrenceException.RecurrenceException;
 import com.tempo.application.model.recurrenceException.RecurrenceExceptionCreateDTO;
 import com.tempo.application.model.recurrenceException.RecurrenceExceptionDTO;
+import com.tempo.application.model.recurrenceException.WorktimeSeriesExceptionCreateDTO;
 import com.tempo.application.model.user.User;
 import com.tempo.application.repository.UserRepository;
 import com.tempo.application.service.RecurrenceExceptionService;
@@ -25,10 +26,10 @@ import java.util.List;
 public class RecurrenceExceptionController {
 
     private static final Logger logger = LoggerUtils.getLogger(RecurrenceExceptionController.class);
-    
+
     @Autowired
     private RecurrenceExceptionService recurrenceExceptionService;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -42,20 +43,21 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
                 return ResponseEntity.badRequest().body(error);
             }
 
             // Récupérer les exceptions pour l'utilisateur (et celles sans séries)
-            List<RecurrenceException> exceptions = recurrenceExceptionService.getAllRecurrenceExceptionsByUserId(user.getId());
-            
+            List<RecurrenceException> exceptions = recurrenceExceptionService
+                    .getAllRecurrenceExceptionsByUserId(user.getId());
+
             // Convertir toutes les exceptions en DTO
             List<RecurrenceExceptionDTO> allExceptions = exceptions.stream()
-                .map(RecurrenceExceptionDTO::fromEntity)
-                .toList();
-            
+                    .map(RecurrenceExceptionDTO::fromEntity)
+                    .toList();
+
             return ResponseEntity.ok(allExceptions);
         } catch (Exception e) {
             LoggerUtils.error(logger, "Error retrieving all recurrence exceptions: " + e.getMessage(), e);
@@ -63,7 +65,7 @@ public class RecurrenceExceptionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-    
+
     /**
      * Crée une nouvelle exception de récurrence (période de pause)
      */
@@ -73,9 +75,8 @@ public class RecurrenceExceptionController {
             LoggerUtils.info(logger, "Creating new recurrence exception");
 
             RecurrenceException createdEntity = recurrenceExceptionService.createRecurrenceException(
-                dto.getPauseStart(), dto.getPauseEnd()
-            );
-            
+                    dto.getPauseStart(), dto.getPauseEnd());
+
             RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(createdEntity);
             return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
@@ -88,7 +89,51 @@ public class RecurrenceExceptionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-    
+
+    /**
+     * Toggle une exception spécifique à une WorktimeSeries pour une journée donnée
+     * Si l'exception existe, elle est supprimée (réactivation)
+     * Si l'exception n'existe pas, elle est créée (annulation)
+     */
+    @PostMapping("/series/toggle")
+    public ResponseEntity<?> toggleWorktimeSeriesException(@Valid @RequestBody WorktimeSeriesExceptionCreateDTO dto) {
+        try {
+            LoggerUtils.info(logger,
+                    "Toggling worktime series exception for series " + dto.getSeriesId() + " on date " + dto.getDate());
+
+            // Récupérer l'utilisateur connecté
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email);
+
+            if (user == null) {
+                ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            // Utiliser la méthode toggle du service
+            RecurrenceException result = recurrenceExceptionService.toggleWorktimeSeriesException(
+                    dto.getSeriesId(), dto.getDate(), user.getId());
+
+            if (result != null) {
+                // Exception créée (série annulée)
+                RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(result);
+                return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+            } else {
+                // Exception supprimée (série réactivée)
+                return ResponseEntity.ok().build();
+            }
+        } catch (IllegalArgumentException e) {
+            LoggerUtils.error(logger, "Validation error toggling worktime series exception: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), "VALIDATION_ERROR");
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            LoggerUtils.error(logger, "Error toggling worktime series exception: " + e.getMessage(), e);
+            ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     /**
      * Récupère une exception de récurrence par son ID
      */
@@ -99,28 +144,30 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
                 return ResponseEntity.badRequest().body(error);
             }
-            
+
             RecurrenceException exception = recurrenceExceptionService.getRecurrenceExceptionById(id);
-            
+
             if (exception == null) {
-                ApiError error = new ApiError(HttpStatus.NOT_FOUND, "Recurrence exception not found", "EXCEPTION_NOT_FOUND");
+                ApiError error = new ApiError(HttpStatus.NOT_FOUND, "Recurrence exception not found",
+                        "EXCEPTION_NOT_FOUND");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
-            
-            boolean isAuthorized = exception.getSeries() != null && 
-                exception.getSeries().stream()
-                    .anyMatch(series -> series.getUser() != null && series.getUser().getId().equals(user.getId()));
-                    
+
+            boolean isAuthorized = exception.getSeries() != null &&
+                    exception.getSeries().stream()
+                            .anyMatch(series -> series.getUser() != null
+                                    && series.getUser().getId().equals(user.getId()));
+
             if (!isAuthorized) {
                 ApiError error = new ApiError(HttpStatus.FORBIDDEN, "Access denied", "ACCESS_DENIED");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
             }
-            
+
             // Utiliser le DTO pour éviter les références circulaires
             RecurrenceExceptionDTO responseDto = RecurrenceExceptionDTO.fromEntity(exception);
             return ResponseEntity.ok(responseDto);
@@ -130,27 +177,27 @@ public class RecurrenceExceptionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-    
+
     /**
      * Met à jour une exception de récurrence existante
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRecurrenceException(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody RecurrenceException recurrenceException) {
         try {
             // Récupérer l'utilisateur connecté
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 return ResponseEntity.badRequest().body("User not found");
             }
-            
+
             RecurrenceException updatedException = recurrenceExceptionService.updateRecurrenceException(
-                id, recurrenceException, user.getId());
-            
+                    id, recurrenceException, user.getId());
+
             return ResponseEntity.ok(updatedException);
         } catch (IllegalArgumentException e) {
             LoggerUtils.error(logger, "Access denied updating recurrence exception: " + e.getMessage(), e);
@@ -160,7 +207,7 @@ public class RecurrenceExceptionController {
             return ResponseEntity.badRequest().body("Error updating recurrence exception: " + e.getMessage());
         }
     }
-    
+
     /**
      * Supprime une exception de récurrence
      */
@@ -171,11 +218,11 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 return ResponseEntity.badRequest().body("User not found");
             }
-            
+
             recurrenceExceptionService.deleteRecurrenceException(id, user.getId());
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
@@ -186,9 +233,10 @@ public class RecurrenceExceptionController {
             return ResponseEntity.badRequest().body("Error deleting recurrence exception: " + e.getMessage());
         }
     }
-    
+
     /**
      * Récupère toutes les exceptions de récurrence pour une série donnée
+     * TODO : à supprimer ?
      */
     @GetMapping("/series/{seriesId}")
     public ResponseEntity<?> getExceptionsBySeries(@PathVariable Long seriesId) {
@@ -197,12 +245,13 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 return ResponseEntity.badRequest().body("User not found");
             }
-            
-            List<RecurrenceException> exceptions = recurrenceExceptionService.getExceptionsBySeriesId(seriesId, user.getId());
+
+            List<RecurrenceException> exceptions = recurrenceExceptionService.getExceptionsBySeriesId(seriesId,
+                    user.getId());
             return ResponseEntity.ok(exceptions);
         } catch (IllegalArgumentException e) {
             LoggerUtils.error(logger, "Access denied retrieving exceptions: " + e.getMessage(), e);
@@ -215,6 +264,7 @@ public class RecurrenceExceptionController {
 
     /**
      * Vérifie si une série peut être liée à une exception
+     * TODO : à supprimer ?
      */
     @GetMapping("/check-link/{seriesId}/{exceptionId}")
     public ResponseEntity<?> checkSeriesLink(
@@ -225,7 +275,7 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
                 return ResponseEntity.badRequest().body(error);
@@ -242,6 +292,7 @@ public class RecurrenceExceptionController {
 
     /**
      * Lie une série à une exception
+     * TODO : à supprimer ?
      */
     @PostMapping("/link/{seriesId}/{exceptionId}")
     public ResponseEntity<?> linkSeriesToException(
@@ -252,7 +303,7 @@ public class RecurrenceExceptionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email);
-            
+
             if (user == null) {
                 ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "User not found", "USER_NOT_FOUND");
                 return ResponseEntity.badRequest().body(error);

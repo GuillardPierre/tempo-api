@@ -5,6 +5,7 @@ import com.tempo.application.model.schedule.ScheduleEntryDTO;
 import com.tempo.application.model.schedule.ScheduleThreeDaysDTO;
 import com.tempo.application.model.worktime.Worktime;
 import com.tempo.application.model.worktimeSeries.WorktimeSeries;
+import com.tempo.application.model.recurrenceException.ExceptionType;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,114 +30,131 @@ public class ScheduleService {
     private WorktimeSeriesService worktimeSeriesService;
 
     /**
-     * Récupère toutes les entrées de planification (Worktime et WorktimeSeries) pour une date donnée et un utilisateur
+     * Récupère toutes les entrées de planification (Worktime et WorktimeSeries)
+     * pour une date donnée et un utilisateur
      *
-     * @param date La date pour laquelle récupérer les entrées
+     * @param date   La date pour laquelle récupérer les entrées
      * @param userId L'ID de l'utilisateur
      * @return Une liste combinée des entrées de planification
      */
     public List<ScheduleEntryDTO> getUserScheduleByDate(LocalDate date, Integer userId) {
         LoggerUtils.info(logger, "Fetching user schedule for date: " + date + " and user id: " + userId);
-        
+
         List<Worktime> worktimes = worktimeService.getAllUserWorktimesByDateAndUserId(date, userId);
-        
+
         List<ScheduleEntryDTO> schedule = new ArrayList<>();
-        
+
         // Convertir les worktimes en DTOs
         List<ScheduleEntryDTO> worktimeDTOs = worktimes.stream()
-            .filter(worktime -> worktime.getEndHour() != null) // Exclure les chronos en cours pour éviter la duplication
-            .map(ScheduleEntryDTO::fromWorktime)
-            .filter(java.util.Objects::nonNull)
-            .collect(Collectors.toList());
-        
+                .filter(worktime -> worktime.getEndHour() != null) // Exclure les chronos en cours pour éviter la
+                                                                   // duplication
+                .map(ScheduleEntryDTO::fromWorktime)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
+
         schedule.addAll(worktimeDTOs);
-        
+
         // Récupérer les séries récurrentes actives pour cette date
         List<WorktimeSeries> activeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForDateAndUser(date, userId);
-        
+
         // Filtrer les séries par jour de la semaine
         List<WorktimeSeries> filteredSeries = filterSeriesByDayOfWeek(activeSeries, date);
-        
-        // Convertir les séries filtrées en DTOs
+
+        // Convertir les séries filtrées en DTOs et marquer celles qui sont annulées
         List<ScheduleEntryDTO> workTimeSeriesDTOs = filteredSeries.stream()
-            .map(ScheduleEntryDTO::fromWorkTimeSeries)
-            .collect(Collectors.toList());
-        
+                .map(series -> {
+                    ScheduleEntryDTO dto = ScheduleEntryDTO.fromWorkTimeSeries(series);
+                    // Vérifier si cette série est annulée pour cette date
+                    boolean isCancelled = isSeriesCancelledForDate(series, date);
+                    dto.setIsCancelled(isCancelled);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
         schedule.addAll(workTimeSeriesDTOs);
-        
+
         // Récupérer les créneaux en cours (endTime = null)
         List<Worktime> ongoingWorktimes = worktimeService.getOngoingWorktimesByUserId(userId);
         List<ScheduleEntryDTO> ongoingWorktimeDTOs = ongoingWorktimes.stream()
-            .map(worktime -> ScheduleEntryDTO.builder()
+                .map(worktime -> ScheduleEntryDTO.builder()
                         .id((long) worktime.getId())
                         .type("CHRONO")
                         .startHour(worktime.getStartHour())
                         .categoryId((long) worktime.getCategory().getId())
                         .categoryName(worktime.getCategory().getName())
                         .build())
-            .collect(Collectors.toList());
-        
+                .collect(Collectors.toList());
+
         schedule.addAll(ongoingWorktimeDTOs);
-        
+
         // Trier par heure de début
         return schedule.stream()
-            .sorted(Comparator.comparing(
-                entry -> entry.getStartHour() != null ? entry.getStartHour().toLocalTime() : null,
-                Comparator.nullsLast(Comparator.naturalOrder())
-            ))
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparing(
+                        entry -> entry.getStartHour() != null ? entry.getStartHour().toLocalTime() : null,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
     }
-    
+
     /**
-     * Filtre une liste de séries récurrentes pour ne conserver que celles qui sont actives
+     * Filtre une liste de séries récurrentes pour ne conserver que celles qui sont
+     * actives
      * pour le jour de la semaine spécifié dans la date
      * 
      * @param series La liste des séries à filtrer
-     * @param date La date pour laquelle vérifier l'activité
+     * @param date   La date pour laquelle vérifier l'activité
      * @return Une liste filtrée de séries actives pour ce jour
      */
     private List<WorktimeSeries> filterSeriesByDayOfWeek(List<WorktimeSeries> series, LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         String dayCode = getDayCode(dayOfWeek);
-        
+
         return series.stream()
-            .filter(s -> {
-                String recurrenceRule = s.getRecurrence();
-                if (recurrenceRule == null || recurrenceRule.isEmpty()) {
-                    return false;
-                }
-                if (recurrenceRule.contains("BYDAY=")) {
-                    String byday = recurrenceRule.substring(recurrenceRule.indexOf("BYDAY=") + 6);
-                    if (byday.contains(";")) {
-                        byday = byday.substring(0, byday.indexOf(";"));
+                .filter(s -> {
+                    String recurrenceRule = s.getRecurrence();
+                    if (recurrenceRule == null || recurrenceRule.isEmpty()) {
+                        return false;
                     }
-                    return byday.contains(dayCode);
-                }
-                return true;
-            })
-            .collect(Collectors.toList());
+                    if (recurrenceRule.contains("BYDAY=")) {
+                        String byday = recurrenceRule.substring(recurrenceRule.indexOf("BYDAY=") + 6);
+                        if (byday.contains(";")) {
+                            byday = byday.substring(0, byday.indexOf(";"));
+                        }
+                        return byday.contains(dayCode);
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
     }
-    
+
     /**
      * Convertit un DayOfWeek Java en code de jour RFC5545 (MO, TU, WE, etc.)
      */
     private String getDayCode(DayOfWeek dayOfWeek) {
         switch (dayOfWeek) {
-            case MONDAY: return "MO";
-            case TUESDAY: return "TU";
-            case WEDNESDAY: return "WE";
-            case THURSDAY: return "TH";
-            case FRIDAY: return "FR";
-            case SATURDAY: return "SA";
-            case SUNDAY: return "SU";
-            default: return "";
+            case MONDAY:
+                return "MO";
+            case TUESDAY:
+                return "TU";
+            case WEDNESDAY:
+                return "WE";
+            case THURSDAY:
+                return "TH";
+            case FRIDAY:
+                return "FR";
+            case SATURDAY:
+                return "SA";
+            case SUNDAY:
+                return "SU";
+            default:
+                return "";
         }
     }
 
     /**
-     * Récupère toutes les entrées de planification (Worktime et WorktimeSeries) pour un mois donné et un utilisateur
+     * Récupère toutes les entrées de planification (Worktime et WorktimeSeries)
+     * pour un mois donné et un utilisateur
      *
-     * @param date Une date du mois pour lequel récupérer les entrées
+     * @param date   Une date du mois pour lequel récupérer les entrées
      * @param userId L'ID de l'utilisateur
      * @return Une liste combinée des entrées de planification du mois
      */
@@ -147,7 +165,7 @@ public class ScheduleService {
         // Récupérer les Worktime pour ce mois
         List<Worktime> worktimes = worktimeService.getAllUserWorktimesByMonthAndUserId(date, userId);
         LoggerUtils.info(logger, "Found " + worktimes.size() + " worktime entries for the month");
-        
+
         List<ScheduleDateEntryDTO> worktimeDTOs = worktimes.stream()
                 .map(ScheduleDateEntryDTO::fromWorktime)
                 .collect(Collectors.toList());
@@ -156,8 +174,9 @@ public class ScheduleService {
         // Récupérer les WorktimeSeries actives pour ce mois
         List<WorktimeSeries> activeSeries = worktimeSeriesService.getActiveWorkTimeSeriesForMonthAndUser(date, userId);
         LoggerUtils.info(logger, "Found " + activeSeries.size() + " worktime series entries for the month");
-        
-        // Pour les séries mensuelles, nous n'avons pas besoin de filtrer par jour de la semaine
+
+        // Pour les séries mensuelles, nous n'avons pas besoin de filtrer par jour de la
+        // semaine
         // car nous voulons toutes les séries actives durant le mois
         List<ScheduleDateEntryDTO> workTimeSeriesDTOs = activeSeries.stream()
                 .map(ScheduleDateEntryDTO::fromWorktimeSeries)
@@ -169,11 +188,28 @@ public class ScheduleService {
 
     public ScheduleThreeDaysDTO getUserScheduleForThreeDays(LocalDate date, Integer userId) {
         LoggerUtils.info(logger, "Getting schedule for three days around: " + date + " for user id: " + userId);
-        
+
         return ScheduleThreeDaysDTO.builder()
-            .yesterday(getUserScheduleByDate(date.minusDays(1), userId))
-            .today(getUserScheduleByDate(date, userId))
-            .tomorrow(getUserScheduleByDate(date.plusDays(1), userId))
-            .build();
+                .yesterday(getUserScheduleByDate(date.minusDays(1), userId))
+                .today(getUserScheduleByDate(date, userId))
+                .tomorrow(getUserScheduleByDate(date.plusDays(1), userId))
+                .build();
+    }
+
+    /**
+     * Vérifie si une WorktimeSeries est annulée pour une date donnée
+     * 
+     * @param series La série à vérifier
+     * @param date   La date à vérifier
+     * @return true si la série est annulée pour cette date, false sinon
+     */
+    private boolean isSeriesCancelledForDate(WorktimeSeries series, LocalDate date) {
+        // Vérifier s'il existe une exception de type WORKTIME_SERIES pour cette série
+        // et cette date
+        return series.getExceptions().stream()
+                .anyMatch(exception -> exception.getExceptionType() == ExceptionType.WORKTIME_SERIES &&
+                        exception.getTargetSeriesId() != null &&
+                        exception.getTargetSeriesId().equals(series.getId()) &&
+                        exception.getPauseStart().toLocalDate().equals(date));
     }
 }

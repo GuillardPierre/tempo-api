@@ -27,20 +27,24 @@ public class RecurrenceException {
     private Long id;
 
     @ManyToMany
-    @JoinTable(
-        name = "recurrence_exception_series",
-        joinColumns = @JoinColumn(name = "exception_id", nullable = false),
-        inverseJoinColumns = @JoinColumn(name = "series_id", nullable = false)
-    )
+    @JoinTable(name = "recurrence_exception_series", joinColumns = @JoinColumn(name = "exception_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "series_id", nullable = false))
     @JsonIgnoreProperties("exceptions")
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     @Builder.Default
     private List<WorktimeSeries> series = new ArrayList<>();
-    
+
     @Column(nullable = false)
     private LocalDateTime pauseStart;
-    
+
     @Column(nullable = false)
     private LocalDateTime pauseEnd;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ExceptionType exceptionType = ExceptionType.DAY;
+
+    @Column(name = "target_series_id")
+    private Long targetSeriesId;
 }

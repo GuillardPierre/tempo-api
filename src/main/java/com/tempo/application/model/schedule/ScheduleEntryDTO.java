@@ -19,14 +19,14 @@ public class ScheduleEntryDTO {
     private LocalDateTime startHour;
     private LocalDateTime endHour;
     private LocalDateTime startDate;
-    private LocalDateTime endDate; 
+    private LocalDateTime endDate;
     private Long duration;
     private String recurrence;
     private Long categoryId;
     private String categoryName;
     private String categoryColor;
     private Boolean ignoreExceptions;
-
+    private Boolean isCancelled;
 
     // Factory method pour créer à partir d'un Worktime
     public static ScheduleEntryDTO fromWorktime(Worktime worktime) {
@@ -39,6 +39,7 @@ public class ScheduleEntryDTO {
                 .duration(worktime.getDuration())
                 .categoryId((long) worktime.getCategory().getId())
                 .categoryName(worktime.getCategory().getName())
+                .isCancelled(false) // Les Worktime ne sont jamais annulés
                 .build();
     }
 
@@ -49,18 +50,19 @@ public class ScheduleEntryDTO {
                 .type("RECURRING")
                 .startDate(workTimeSeries.getStartDate())
                 .endDate(workTimeSeries.getEndDate())
-                .startHour(workTimeSeries.getStartHour())  
-                .endHour(workTimeSeries.getEndHour())        
+                .startHour(workTimeSeries.getStartHour())
+                .endHour(workTimeSeries.getEndHour())
                 .recurrence(workTimeSeries.getRecurrence())
                 .duration(workTimeSeries.getDuration())
                 .categoryId((long) workTimeSeries.getCategory().getId())
                 .categoryName(workTimeSeries.getCategory().getName())
                 .ignoreExceptions(workTimeSeries.getIgnoreExceptions())
+                .isCancelled(false) // Sera défini par le ScheduleService selon les exceptions
                 .build();
     }
 
-    
-    // Alias pour assurer la compatibilité avec l'appel existant dans ScheduleService
+    // Alias pour assurer la compatibilité avec l'appel existant dans
+    // ScheduleService
     public static ScheduleEntryDTO fromWorktimeSeries(WorktimeSeries workTimeSeries) {
         return fromWorkTimeSeries(workTimeSeries);
     }
