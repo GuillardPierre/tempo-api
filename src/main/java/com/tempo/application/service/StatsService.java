@@ -42,10 +42,17 @@ public class StatsService {
                !occurrence.toLocalDate().isAfter(exception.getPauseEnd().toLocalDate());
     }
 
-    @Cacheable(value = "categoryStats", key = "#userId + ':' + #from + ':' + #to")
+    // @Cacheable(value = "categoryStats", key = "#userId + ':' + #from + ':' + #to") // Temporairement désactivé pour debug
     public List<CategoryStatDTO> getCategoryStats(Integer userId, LocalDateTime from, LocalDateTime to) {
+        System.out.println("DEBUG: getCategoryStats called with userId=" + userId + ", from=" + from + ", to=" + to);
+        
         // 1. Récupérer tous les worktimes ponctuels (pas besoin de filtrer)
         List<Object[]> ponctuelsRaw = worktimeRepository.getCategoryStatsByUserAndPeriod(userId, from, to);
+        System.out.println("DEBUG: Found " + ponctuelsRaw.size() + " worktime entries from SQL query");
+        for (Object[] row : ponctuelsRaw) {
+            System.out.println("DEBUG: Category=" + row[0] + ", Duration=" + row[1]);
+        }
+        
         Map<String, Integer> totalDurations = new HashMap<>();
         for (Object[] row : ponctuelsRaw) {
             String categoryName = (String) row[0];
