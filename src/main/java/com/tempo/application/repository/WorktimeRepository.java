@@ -21,9 +21,13 @@ public interface WorktimeRepository extends JpaRepository<Worktime, Integer> {
   // Retourne tous les worktimes pour une plage de dates
   List<Worktime> findByStartHourBetween(LocalDateTime start, LocalDateTime end);
 
-  // Retourne tous les worktimes pour une plage de dates et un utilisateur
-  // spécifique
-  List<Worktime> findByStartHourBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
+    // Retourne tous les worktimes pour une plage de dates et un utilisateur
+    // spécifique
+    List<Worktime> findByStartHourBetweenAndUser(LocalDateTime start, LocalDateTime end, User user);
+
+    // Retourne tous les worktimes qui se chevauchent avec une plage de dates et un utilisateur
+    @Query("SELECT w FROM Worktime w WHERE w.user = :user AND w.startHour < :end AND (w.endHour IS NULL OR w.endHour > :start) AND w.endHour IS NOT NULL")
+    List<Worktime> findOverlappingWorktimesByUserAndPeriod(@Param("user") User user, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   // Récupère tous les worktimes en cours (sans endTime) pour un utilisateur
   List<Worktime> findByUserAndEndHourIsNull(User user);

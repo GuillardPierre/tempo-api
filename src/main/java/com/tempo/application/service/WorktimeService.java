@@ -145,7 +145,7 @@ public class WorktimeService {
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return worktimeRepository.findByStartHourBetweenAndUser(startOfDay, endOfDay, user);
+        return worktimeRepository.findOverlappingWorktimesByUserAndPeriod(user, startOfDay, endOfDay);
     }
 
     public List<Worktime> getAllUserWorktimesByMonthAndUserId(LocalDate date, Integer userId) {
