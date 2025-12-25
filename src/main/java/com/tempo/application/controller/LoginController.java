@@ -97,11 +97,12 @@ public class LoginController {
                         // Générer un nouveau JWT token
                         String token = jwtUtils.generateToken(user.getEmail());
 
-                        // Générer un nouveau refresh token (remplace l'ancien)
-                        String newRefreshToken = refreshTokenService.createRefreshToken(user.getEmail()).getToken();
+                        // On garde le même refresh token pour éviter les problèmes de concurrence
+                        // String newRefreshToken =
+                        // refreshTokenService.createRefreshToken(user.getEmail()).getToken();
 
                         Map<String, Object> authData = new HashMap<>();
-                        authData.put("refreshToken", newRefreshToken);
+                        authData.put("refreshToken", requestRefreshToken);
                         authData.put("token", token);
                         authData.put("type", "Bearer");
                         return ResponseEntity.ok(authData);
